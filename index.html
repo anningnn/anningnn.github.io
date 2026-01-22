@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>My Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+}
+
+body {
+    background-color: #f5f6f8;
+    color: #333;
+}
+
+/* ===== 头部背景 ===== */
+.header {
+    height: 420px;
+    background-image: url("images/header-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+}
+
+/* ===== 头像 ===== */
+.profile {
+    position: relative;
+    margin-top: -90px;
+    text-align: center;
+}
+
+.avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    object-fit: cover;
+}
+
+.name {
+    margin-top: 12px;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.bio {
+    margin-top: 6px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* ===== 工具栏 ===== */
+.toolbar {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.toolbar input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.toolbar button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* ===== 内容 ===== */
+.container {
+    max-width: 900px;
+    margin: 0 auto 40px;
+    padding: 0 20px;
+}
+
+.post {
+    background: #fff;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.post h2 {
+    cursor: pointer;
+    padding-right: 40px;
+}
+
+/* 删除按钮 */
+.delete-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.4;
+}
+
+.delete-btn:hover {
+    opacity: 1;
+}
+
+/* 摘要 & 正文 */
+.summary {
+    margin-top: 8px;
+    color: #666;
+    font-size: 14px;
+}
+
+.content {
+    margin-top: 16px;
+    display: none;
+    line-height: 1.7;
+}
+
+/* ===== 编辑高亮 ===== */
+[contenteditable]:focus {
+    outline: none;
+    background: rgba(79,70,229,0.08);
+}
+
+.post:focus-within {
+    box-shadow: 0 0 0 2px rgba(79,70,229,0.25);
+}
+
+/* ===== 页脚 ===== */
+footer {
+    text-align: center;
+    padding: 30px 0;
+    color: #aaa;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header"></div>
+
+<div class="profile">
+    <img src="images/avatar.jpg" class="avatar">
+    <div class="name" contenteditable="true">安宁</div>
+    <div class="bio" contenteditable="true">记录学习 · 技术 · 生活</div>
+</div>
+
+<!-- 工具栏 -->
+<div class="toolbar">
+    <input type="text" placeholder="搜索文章…" oninput="searchPosts(this.value)">
+    <button onclick="addPost()">➕ 新文章</button>
+    <button onclick="savePage()">保存</button>
+</div>
+
+<!-- 博客内容 -->
+<div class="container" id="postContainer">
+    <div class="post">
+        <button class="delete-btn" onclick="deletePost(this)">🗑</button>
+
+        <h2 onclick="togglePost(this)" contenteditable="true">
+            当作日记本用
+        </h2>
+
+        <div class="summary" contenteditable="true">
+            今天写了点东西，感觉很不错。
+        </div>
+
+        <div class="content" contenteditable="true">
+            <p>
+                这里是正文内容。  
+                你可以直接粘贴图片、截图、长文本，
+                折叠起来就不会影响其它文章阅读了。
+            </p>
+        </div>
+    </div>
+</div>
+
+<footer contenteditable="true">
+    © 2026 My Blog
+</footer>
+
+<script>
+function togglePost(title) {
+    const content = title.parentElement.querySelector(".content");
+    content.style.display =
+        content.style.display === "none" || content.style.display === ""
+            ? "block"
+            : "none";
+}
+
+function addPost() {
+    const container = document.getElementById("postContainer");
+
+    const post = document.createElement("div");
+    post.className = "post";
+    post.innerHTML = `
+        <button class="delete-btn" onclick="deletePost(this)">🗑</button>
+        <h2 onclick="togglePost(this)" contenteditable="true">新文章标题</h2>
+        <div class="summary" contenteditable="true">一句话摘要（折叠时显示）</div>
+        <div class="content" contenteditable="true">
+            <p>在这里写正文内容 ✍️</p>
+        </div>
+    `;
+
+    container.prepend(post);
+}
+
+function deletePost(btn) {
+    if (confirm("确定要删除这篇文章吗？")) {
+        btn.parentElement.remove();
+    }
+}
+
+function searchPosts(keyword) {
+    keyword = keyword.toLowerCase();
+    document.querySelectorAll(".post").forEach(post => {
+        const text = post.innerText.toLowerCase();
+        post.style.display = text.includes(keyword) ? "block" : "none";
+    });
+}
+
+function savePage() {
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: "text/html" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "blog.html";
+    a.click();
+}
+</script>
+
+</body>
+</html>
+
