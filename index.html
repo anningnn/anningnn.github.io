@@ -218,16 +218,27 @@ function addPost() {
 
     const post = document.createElement("div");
     post.className = "post";
+
     post.innerHTML = `
         <button class="delete-btn" onclick="deletePost(this)">🗑</button>
-        <h2 onclick="togglePost(this)" contenteditable="true">新文章标题</h2>
-        <div class="summary" contenteditable="true">一句话摘要（折叠时显示）</div>
-        <div class="content" contenteditable="true">
-            <p>在这里写正文内容 ✍️</p>
+
+        <h2 onclick="togglePost(this)" contenteditable="true">
+            新文章标题
+        </h2>
+
+        <div class="date">${getToday()}</div>
+
+        <div class="summary" contenteditable="true">
+            一句话摘要（可选）
+        </div>
+
+        <div class="content" contenteditable="true" style="display:none;">
+            <p>在这里开始写正文吧 ✍️</p>
         </div>
     `;
 
     container.prepend(post);
+    autoSave(); // ⭐ 新文章立刻存到 LocalStorage
 }
 
 function deletePost(btn) {
@@ -252,6 +263,39 @@ function savePage() {
     a.download = "index.html";
     a.click();
 }
+
+const STORAGE_KEY = "my-blog-content";
+
+function autoSave() {
+    const container = document.getElementById("postContainer");
+    if (!container) return;
+    localStorage.setItem(STORAGE_KEY, container.innerHTML);
+}
+
+function restoreFromStorage() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const container = document.getElementById("postContainer");
+    if (saved && container) {
+        container.innerHTML = saved;
+    }
+}
+
+document.addEventListener("input", (e) => {
+    if (e.target.closest("#postContainer")) {
+        autoSave();
+    }
+});
+
+window.addEventListener("DOMContentLoaded", restoreFromStorage)
+
+function getToday() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
 </script>
 
 
