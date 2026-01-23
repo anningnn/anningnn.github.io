@@ -57,6 +57,12 @@ body {
     font-size: 14px;
 }
 
+<div class="toolbar">
+    <input type="text"
+           placeholder="搜索文章…"
+           oninput="searchPosts(this.value)">
+</div>
+
 /* ===== 内容 ===== */
 .container {
     max-width: 900px;
@@ -136,6 +142,27 @@ footer {
     </div>
 
 </div>
+
+<script>
+function searchPosts(keyword) {
+    keyword = keyword.trim().toLowerCase();
+
+    const posts = document.querySelectorAll(".post");
+
+    posts.forEach(post => {
+        const title = post.querySelector("h2")?.innerText.toLowerCase() || "";
+        const summary = post.querySelector(".summary")?.innerText.toLowerCase() || "";
+        const date = post.querySelector(".date")?.innerText.toLowerCase() || "";
+
+        const hit =
+            title.includes(keyword) ||
+            summary.includes(keyword) ||
+            date.includes(keyword);
+
+        post.style.display = hit ? "block" : "none";
+    });
+}
+</script>
 
 <footer>
     © 2026 My Blog
