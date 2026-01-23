@@ -174,6 +174,13 @@ footer {
 <!-- 博客内容 -->
 <div class="container" id="postContainer"><div class="post">
         <button class="delete-btn" onclick="deletePost(this)">🗑</button>
+        <h2 onclick="togglePost(this)" contenteditable="true">测试一下</h2>
+        <div class="summary" contenteditable="true">一句话摘要（折叠时显示）</div>
+        <div class="content" contenteditable="true" style="display: block;">
+            <p>在这里写正文内容 ✍️</p>
+        </div>
+    </div><div class="post">
+        <button class="delete-btn" onclick="deletePost(this)">🗑</button>
         <h2 onclick="togglePost(this)" contenteditable="true">这个苹果背景真是太有feeling了</h2>
         <div class="summary" contenteditable="true">不仅是艺术啊我亲爱的</div>
         <div class="content" contenteditable="true" style="display: none;">
@@ -246,6 +253,7 @@ function savePage() {
     a.click();
 }
 </script>
+
 
 
 
