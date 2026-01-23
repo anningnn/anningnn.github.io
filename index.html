@@ -249,7 +249,7 @@ function savePage() {
     const blob = new Blob([html], { type: "text/html" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "index.html"; // 固定为 index.html
+    a.download = "index.html";
     a.click();
 }
 </script>
