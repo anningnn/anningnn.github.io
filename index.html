@@ -1,4 +1,6 @@
-<html lang="zh-CN"><head>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
 <meta charset="UTF-8">
 <title>My Blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,17 +11,6 @@
     padding: 0;
     box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-}
-.post h2 a {
-    color: #333;
-    text-decoration: none;
-}
-
-.post h2 a:hover {
-    color: #4f46e5;
-    text-decoration: underline;
-}
-
 }
 
 body {
@@ -35,7 +26,6 @@ body {
     background-position: center;
     position: relative;
 }
-
 .header::after {
     content: "";
     position: absolute;
@@ -49,7 +39,6 @@ body {
     margin-top: -90px;
     text-align: center;
 }
-
 .avatar {
     width: 140px;
     height: 140px;
@@ -57,102 +46,47 @@ body {
     border: 5px solid #fff;
     object-fit: cover;
 }
-
 .name {
     margin-top: 12px;
     font-size: 26px;
     font-weight: 600;
 }
-
 .bio {
     margin-top: 6px;
     color: #666;
     font-size: 14px;
 }
 
-/* ===== 工具栏 ===== */
-.toolbar {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 0 20px;
-    display: flex;
-    gap: 10px;
-}
-
-.toolbar input {
-    flex: 1;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-.toolbar button {
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    background: #4f46e5;
-    color: #fff;
-    cursor: pointer;
-}
-
 /* ===== 内容 ===== */
 .container {
     max-width: 900px;
-    margin: 0 auto 40px;
+    margin: 40px auto;
     padding: 0 20px;
 }
-
 .post {
     background: #fff;
     padding: 22px;
     border-radius: 12px;
     margin-bottom: 20px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-    position: relative;
 }
-
-.post h2 {
-    cursor: pointer;
-    padding-right: 40px;
+.post h2 a {
+    color: #333;
+    text-decoration: none;
 }
-
-/* 删除按钮 */
-.delete-btn {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    border: none;
-    background: transparent;
-    font-size: 18px;
-    cursor: pointer;
-    opacity: 0.4;
+.post h2 a:hover {
+    color: #4f46e5;
+    text-decoration: underline;
 }
-
-.delete-btn:hover {
-    opacity: 1;
+.date {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #999;
 }
-
-/* 摘要 & 正文 */
 .summary {
-    margin-top: 8px;
+    margin-top: 10px;
     color: #666;
     font-size: 14px;
-}
-
-.content {
-    margin-top: 16px;
-    display: none;
-    line-height: 1.7;
-}
-
-/* ===== 编辑高亮 ===== */
-[contenteditable]:focus {
-    outline: none;
-    background: rgba(79,70,229,0.08);
-}
-
-.post:focus-within {
-    box-shadow: 0 0 0 2px rgba(79,70,229,0.25);
 }
 
 /* ===== 页脚 ===== */
@@ -171,173 +105,41 @@ footer {
 
 <div class="profile">
     <img src="images/avatar.jpg" class="avatar">
-    <div class="name" contenteditable="true">安宁</div>
-    <div class="bio" contenteditable="true">my blog</div>
+    <div class="name">安宁</div>
+    <div class="bio">my blog</div>
 </div>
 
-<!-- 工具栏 -->
-<div class="toolbar">
-    <input type="text" placeholder="搜索文章…" oninput="searchPosts(this.value)">
-    <button onclick="addPost()">➕ 新文章</button>
-    <button onclick="savePage()">保存</button>
-</div>
+<div class="container">
 
-<!-- 博客内容 -->
-<div class="container" id="postContainer"><div class="post">
-        <button class="delete-btn" onclick="deletePost(this)">🗑</button>
-
-       <h2>
-    <a href="posts/post-001.html">日期功能！</a>
-</h2>
-
-
+    <div class="post">
+        <h2><a href="posts/post-001.html">日期功能！</a></h2>
         <div class="date">2026-01-23</div>
-
-        <div class="summary" contenteditable="true">辛苦我和gpt老师了</div>
-
-    </div><div class="post">
-    <button class="delete-btn" onclick="deletePost(this)">🗑</button>
-
-    <h2>
-        <a href="posts/post-002.html">更新日志【？</a>
-    </h2>
-
-    <div class="date">2026-01-23</div>
-    <div class="summary">可以这么说吧嘻嘻嘻</div>
-</div>
-        
-    <div class="post">
-    <button class="delete-btn" onclick="deletePost(this)">🗑</button>
-
-    <h2>
-        <a href="posts/post-003.html">这个苹果背景真是太有 feeling 了</a>
-    </h2>
-
-    <div class="date">2026-01-22</div>
-    <div class="summary">不仅是艺术啊我亲爱的</div>
-</div>
-        <div class="content" contenteditable="true" style="display: block;">
-            <p>苹果首先象征着平安，而且好吃，还好看，还是我微信头像，简直完美</p><p>没错这个web还能插图，太完美了哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈</p>
-        </div>
-    
-    <div class="post">
-    <button class="delete-btn" onclick="deletePost(this)">🗑</button>
-
-    <h2>
-        <a href="posts/post-004.html">做了四个小时的博客!!!</a>
-    </h2>
-
-    <div class="date">2026-01-21</div>
-    <div class="summary">要特别感谢 ChatGPT 帮忙，爱你</div>
-</div>
-
-
-        <div class="content" contenteditable="true" style="display: none;">
-            <p>寒假是这样的，有时间做网站，这工作成果使我自我感觉非常良好（人话就是自恋）哎呀哎呀真是太厉害了</p>
-        </div>
+        <div class="summary">辛苦我和 gpt 老师了</div>
     </div>
+
+    <div class="post">
+        <h2><a href="posts/post-002.html">更新日志【？】</a></h2>
+        <div class="date">2026-01-23</div>
+        <div class="summary">可以这么说吧嘻嘻嘻</div>
+    </div>
+
+    <div class="post">
+        <h2><a href="posts/post-003.html">这个苹果背景真是太有 feeling 了</a></h2>
+        <div class="date">2026-01-22</div>
+        <div class="summary">不仅是艺术啊我亲爱的</div>
+    </div>
+
+    <div class="post">
+        <h2><a href="posts/post-004.html">做了四个小时的博客!!!</a></h2>
+        <div class="date">2026-01-21</div>
+        <div class="summary">要特别感谢 ChatGPT 帮忙，爱你</div>
+    </div>
+
 </div>
 
-<footer contenteditable="true">
+<footer>
     © 2026 My Blog
 </footer>
 
-<script>
-function togglePost(title) {
-    const content = title.parentElement.querySelector(".content");
-    content.style.display =
-        content.style.display === "none" || content.style.display === ""
-            ? "block"
-            : "none";
-}
-
-function addPost() {
-    const container = document.getElementById("postContainer");
-
-    const post = document.createElement("div");
-    post.className = "post";
-
-    post.innerHTML = `
-        <button class="delete-btn" onclick="deletePost(this)">🗑</button>
-
-        <h2 onclick="togglePost(this)" contenteditable="true">
-            新文章标题
-        </h2>
-
-        <div class="date">${getToday()}</div>
-
-        <div class="summary" contenteditable="true">
-            一句话摘要（可选）
-        </div>
-
-        <div class="content" contenteditable="true" style="display:none;">
-            <p>在这里开始写正文吧 ✍️</p>
-        </div>
-    `;
-
-    container.prepend(post);
-    autoSave(); // ⭐ 新文章立刻存到 LocalStorage
-}
-
-function deletePost(btn) {
-    if (confirm("确定要删除这篇文章吗？")) {
-        btn.parentElement.remove();
-    }
-}
-
-function searchPosts(keyword) {
-    keyword = keyword.toLowerCase();
-    document.querySelectorAll(".post").forEach(post => {
-        const text = post.innerText.toLowerCase();
-        post.style.display = text.includes(keyword) ? "block" : "none";
-    });
-}
-
-function savePage() {
-    const html = document.documentElement.outerHTML;
-    const blob = new Blob([html], { type: "text/html" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "index.html";
-    a.click();
-}
-
-const STORAGE_KEY = "my-blog-content";
-
-function autoSave() {
-    const container = document.getElementById("postContainer");
-    if (!container) return;
-    localStorage.setItem(STORAGE_KEY, container.innerHTML);
-}
-
-function restoreFromStorage() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const container = document.getElementById("postContainer");
-    if (saved && container) {
-        container.innerHTML = saved;
-    }
-}
-
-document.addEventListener("input", (e) => {
-    if (e.target.closest("#postContainer")) {
-        autoSave();
-    }
-});
-
-window.addEventListener("DOMContentLoaded", restoreFromStorage)
-
-function getToday() {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-}
-
-</script>
-
-
-
-
-
-</body></html>
+</body>
+</html>
