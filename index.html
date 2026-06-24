@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>My Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+}
+
+body {
+    background-color: #f5f6f8;
+    color: #333;
+}
+
+/* ===== 头部背景 ===== */
+.header {
+    height: 420px;
+    background-image: url("images/header-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+.header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+}
+
+/* ===== 头像 ===== */
+.profile {
+    position: relative;
+    margin-top: -90px;
+    text-align: center;
+}
+.avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    object-fit: cover;
+}
+.name {
+    margin-top: 12px;
+    font-size: 26px;
+    font-weight: 600;
+}
+.bio {
+    margin-top: 6px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* ===== 搜索栏 ===== */
+.toolbar {
+    max-width: 900px;
+    margin: 30px auto 10px;
+    padding: 0 20px;
+}
+.toolbar input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+/* ===== 内容 ===== */
+.container {
+    max-width: 900px;
+    margin: 20px auto 40px;
+    padding: 0 20px;
+}
+.post {
+    background: #fff;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+.post h2 a {
+    color: #333;
+    text-decoration: none;
+}
+.post h2 a:hover {
+    color: #4f46e5;
+    text-decoration: underline;
+}
+.date {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #999;
+}
+.summary {
+    margin-top: 10px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* ===== 页脚 ===== */
+footer {
+    text-align: center;
+    padding: 30px 0;
+    color: #aaa;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header"></div>
+
+<div class="profile">
+    <img src="images/avatar.jpg" class="avatar">
+    <div class="name">安宁</div>
+    <div class="bio">my blog</div>
+</div>
+
+<!-- 搜索框 -->
+<div class="toolbar">
+    <input type="text"
+           placeholder="搜索文章（标题 / 摘要 / 日期）…"
+           oninput="searchPosts(this.value)">
+</div>
+
+<!-- 博客列表 -->
+<div class="container">
+
+<div class="post">
+        <h2><a href="posts/post-005.html">我的爱人</a></h2>
+        <div class="date">2026-01-24</div>
+        <div class="summary">我晃晃悠悠从高空落下/平平安安回到地上</div>
+    </div>
+
+    <div class="post">
+        <h2><a href="posts/post-001.html">日期功能！</a></h2>
+        <div class="date">2026-01-23</div>
+        <div class="summary">辛苦我和 gpt 老师了</div>
+    </div>
+
+    <div class="post">
+        <h2><a href="posts/post-002.html">更新日志【？】</a></h2>
+        <div class="date">2026-01-23</div>
+        <div class="summary">可以这么说吧嘻嘻嘻</div>
+    </div>
+
+    <div class="post">
+        <h2><a href="posts/post-003.html">这个苹果背景真是太有 feeling 了</a></h2>
+        <div class="date">2026-01-22</div>
+        <div class="summary">不仅是艺术啊我亲爱的</div>
+    </div>
+
+    <div class="post">
+        <h2><a href="posts/post-004.html">做了四个小时的博客!!!</a></h2>
+        <div class="date">2026-01-23</div>
+        <div class="summary">要特别感谢 ChatGPT 帮忙，爱你</div>
+    </div>
+
+</div>
+
+<footer>
+    © 2026 My Blog
+</footer>
+
+<script>
+function searchPosts(keyword) {
+    keyword = keyword.trim().toLowerCase();
+    document.querySelectorAll(".post").forEach(post => {
+        const text = post.innerText.toLowerCase();
+        post.style.display = text.includes(keyword) ? "block" : "none";
+    });
+}
+</script>
+
+</body>
+</html>
+
