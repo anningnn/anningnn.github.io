@@ -18,16 +18,25 @@ body {
     color: #333;
 }
 
-/* ===== 头图 ===== */
+/* ===== 头图（恢复图片模式） ===== */
 .header {
-    height: 320px;
-    background: linear-gradient(120deg, #4f46e5, #9333ea);
+    height: 380px;
+    background-image: url("images/header-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+.header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
 }
 
 /* ===== 个人信息 ===== */
 .profile {
     text-align: center;
-    margin-top: -70px;
+    margin-top: -80px;
 }
 
 .avatar {
@@ -45,8 +54,8 @@ body {
 }
 
 .bio {
-    color: #666;
     font-size: 14px;
+    color: #666;
 }
 
 /* ===== 搜索 ===== */
@@ -64,58 +73,25 @@ body {
     box-shadow: 0 4px 18px rgba(0,0,0,0.08);
 }
 
-/* ===== 容器 ===== */
+/* ===== 列表 ===== */
 .container {
     max-width: 900px;
-    margin: 20px auto 60px;
+    margin: 20px auto 80px;
     padding: 0 20px;
 }
 
-/* ===== 卡片 ===== */
 .post {
-    background: rgba(255,255,255,0.9);
-    backdrop-filter: blur(10px);
+    background: white;
     padding: 18px;
     border-radius: 14px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    cursor: pointer;
     transition: 0.2s;
-    position: relative;
 }
 
 .post:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-}
-
-.post h2 {
-    font-size: 18px;
-}
-
-.date {
-    font-size: 12px;
-    color: #999;
-    margin-top: 6px;
-}
-
-.summary {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #555;
-}
-
-/* 删除按钮 */
-.delete {
-    position: absolute;
-    right: 12px;
-    top: 12px;
-    background: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 4px 8px;
-    cursor: pointer;
-    font-size: 12px;
 }
 
 /* ===== 悬浮按钮 ===== */
@@ -126,53 +102,94 @@ body {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: #4f46e5;
+    background: #111;
     color: white;
     font-size: 30px;
     border: none;
     cursor: pointer;
 }
 
-/* ===== 弹窗 ===== */
-.modal {
+/* ===== 全屏编辑器 ===== */
+.editor {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.4);
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
     background: white;
-    padding: 20px;
-    border-radius: 12px;
-    width: 320px;
-    display: flex;
+    z-index: 999;
     flex-direction: column;
-    gap: 10px;
 }
 
-.modal-content input {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+.editor header {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
 }
 
-.modal-content button {
-    padding: 10px;
+.editor input, .editor textarea {
+    width: 100%;
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    outline: none;
+    padding: 16px;
+    font-size: 16px;
 }
 
-.save {
-    background: #4f46e5;
+.editor textarea {
+    flex: 1;
+    resize: none;
+}
+
+.editor button {
+    background: #111;
     color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
 }
 
-.close {
-    background: #eee;
+/* ===== 阅读页 ===== */
+.reader {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    z-index: 1000;
+    overflow: auto;
+}
+
+.reader-content {
+    max-width: 700px;
+    margin: 80px auto;
+    padding: 20px;
+}
+
+.reader-title {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.reader-date {
+    font-size: 13px;
+    color: #999;
+    margin-top: 8px;
+}
+
+.reader-text {
+    margin-top: 20px;
+    line-height: 1.7;
+    color: #444;
+}
+
+/* 阅读页淡删除 */
+.reader-delete {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.05);
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
 }
 </style>
 </head>
@@ -184,96 +201,123 @@ body {
 <div class="profile">
     <img src="images/avatar.jpg" class="avatar">
     <div class="name">安宁</div>
-    <div class="bio">My Personal Blog</div>
+    <div class="bio">My Blog</div>
 </div>
 
 <!-- 搜索 -->
 <div class="toolbar">
-    <input type="text" placeholder="搜索文章..." oninput="searchPosts(this.value)">
+    <input placeholder="搜索文章..." oninput="searchPosts(this.value)">
 </div>
 
-<!-- 内容 -->
-<div class="container" id="container"></div>
+<!-- 列表 -->
+<div class="container" id="list"></div>
 
-<!-- 悬浮按钮 -->
-<button class="fab" onclick="openModal()">＋</button>
+<!-- 发布按钮 -->
+<button class="fab" onclick="openEditor()">＋</button>
 
-<!-- 弹窗 -->
-<div class="modal" id="modal">
-    <div class="modal-content">
-        <input id="title" placeholder="标题">
-        <input id="summary" placeholder="摘要">
-        <button class="save" onclick="addPost()">发布</button>
-        <button class="close" onclick="closeModal()">关闭</button>
+<!-- 全屏编辑 -->
+<div class="editor" id="editor">
+    <header>
+        <span>写文章</span>
+        <button onclick="publish()">发布</button>
+    </header>
+    <input id="title" placeholder="标题">
+    <textarea id="content" placeholder="开始写点什么..."></textarea>
+</div>
+
+<!-- 阅读页 -->
+<div class="reader" id="reader">
+    <div class="reader-content">
+        <div class="reader-title" id="rTitle"></div>
+        <div class="reader-date" id="rDate"></div>
+        <div class="reader-text" id="rText"></div>
     </div>
+    <button class="reader-delete" onclick="deleteCurrent()">删除</button>
 </div>
 
 <script>
 let posts = JSON.parse(localStorage.getItem("posts")) || [];
+let currentIndex = null;
 
-/* 初始渲染 */
+/* 列表渲染 */
 function render(list = posts) {
-    const container = document.getElementById("container");
-    container.innerHTML = "";
+    const el = document.getElementById("list");
+    el.innerHTML = "";
 
-    list.forEach((post, index) => {
-        container.innerHTML += `
-        <div class="post">
-            <button class="delete" onclick="deletePost(${index})">删除</button>
-            <h2>${post.title}</h2>
-            <div class="date">${post.date}</div>
-            <div class="summary">${post.summary}</div>
+    list.forEach((p, i) => {
+        el.innerHTML += `
+        <div class="post" onclick="openPost(${i})">
+            <h3>${p.title}</h3>
+            <div style="font-size:12px;color:#999;margin-top:6px">${p.date}</div>
         </div>`;
     });
 }
 
 /* 发布 */
-function addPost() {
+function publish() {
     const title = document.getElementById("title").value;
-    const summary = document.getElementById("summary").value;
+    const content = document.getElementById("content").value;
 
     if (!title) return;
 
     posts.unshift({
         title,
-        summary,
-        date: new Date().toISOString().slice(0, 10)
+        content,
+        date: new Date().toISOString().slice(0,10)
     });
 
     localStorage.setItem("posts", JSON.stringify(posts));
 
-    closeModal();
+    closeEditor();
     render();
 }
 
-/* 删除 */
-function deletePost(index) {
-    posts.splice(index, 1);
+/* 打开文章 */
+function openPost(i) {
+    currentIndex = i;
+    const p = posts[i];
+
+    document.getElementById("rTitle").innerText = p.title;
+    document.getElementById("rDate").innerText = p.date;
+    document.getElementById("rText").innerText = p.content;
+
+    document.getElementById("reader").style.display = "block";
+}
+
+/* 删除（淡按钮） */
+function deleteCurrent() {
+    if (currentIndex === null) return;
+
+    posts.splice(currentIndex, 1);
     localStorage.setItem("posts", JSON.stringify(posts));
+
+    closeReader();
     render();
+}
+
+/* 编辑器 */
+function openEditor() {
+    document.getElementById("editor").style.display = "flex";
+}
+
+function closeEditor() {
+    document.getElementById("editor").style.display = "none";
+    document.getElementById("title").value = "";
+    document.getElementById("content").value = "";
+}
+
+/* 阅读页关闭 */
+function closeReader() {
+    document.getElementById("reader").style.display = "none";
 }
 
 /* 搜索 */
-function searchPosts(keyword) {
-    keyword = keyword.toLowerCase();
-
-    const filtered = posts.filter(p =>
-        p.title.toLowerCase().includes(keyword) ||
-        p.summary.toLowerCase().includes(keyword)
-    );
-
-    render(filtered);
-}
-
-/* 弹窗 */
-function openModal() {
-    document.getElementById("modal").style.display = "flex";
-}
-
-function closeModal() {
-    document.getElementById("modal").style.display = "none";
-    document.getElementById("title").value = "";
-    document.getElementById("summary").value = "";
+function searchPosts(k) {
+    k = k.toLowerCase();
+    render(posts.filter(p =>
+        p.title.toLowerCase().includes(k) ||
+        p.content.toLowerCase().includes(k)
+    ));
 }
 
 /* 初始化 */
