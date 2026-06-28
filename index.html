@@ -14,101 +14,165 @@
 }
 
 body {
-    background-color: #f5f6f8;
+    background: #f5f6f8;
     color: #333;
 }
 
-/* ===== 头部背景 ===== */
+/* ===== 头图 ===== */
 .header {
-    height: 420px;
-    background-image: url("images/header-bg.jpg");
-    background-size: cover;
-    background-position: center;
-    position: relative;
-}
-.header::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
+    height: 320px;
+    background: linear-gradient(120deg, #4f46e5, #9333ea);
 }
 
-/* ===== 头像 ===== */
+/* ===== 个人信息 ===== */
 .profile {
-    position: relative;
-    margin-top: -90px;
     text-align: center;
+    margin-top: -70px;
 }
+
 .avatar {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     border: 5px solid #fff;
     object-fit: cover;
 }
+
 .name {
-    margin-top: 12px;
-    font-size: 26px;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
 }
+
 .bio {
-    margin-top: 6px;
     color: #666;
     font-size: 14px;
 }
 
-/* ===== 搜索栏 ===== */
+/* ===== 搜索 ===== */
 .toolbar {
     max-width: 900px;
-    margin: 30px auto 10px;
+    margin: 20px auto;
     padding: 0 20px;
 }
+
 .toolbar input {
     width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    font-size: 14px;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
 }
 
-/* ===== 内容 ===== */
+/* ===== 容器 ===== */
 .container {
     max-width: 900px;
-    margin: 20px auto 40px;
+    margin: 20px auto 60px;
     padding: 0 20px;
 }
+
+/* ===== 卡片 ===== */
 .post {
-    background: #fff;
-    padding: 22px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-}
-.post h2 a {
-    color: #333;
-    text-decoration: none;
-}
-.post h2 a:hover {
-    color: #4f46e5;
-    text-decoration: underline;
-}
-.date {
-    margin-top: 6px;
-    font-size: 13px;
-    color: #999;
-}
-.summary {
-    margin-top: 10px;
-    color: #666;
-    font-size: 14px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    transition: 0.2s;
+    position: relative;
 }
 
-/* ===== 页脚 ===== */
-footer {
-    text-align: center;
-    padding: 30px 0;
-    color: #aaa;
-    font-size: 13px;
+.post:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.post h2 {
+    font-size: 18px;
+}
+
+.date {
+    font-size: 12px;
+    color: #999;
+    margin-top: 6px;
+}
+
+.summary {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* 删除按钮 */
+.delete {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* ===== 悬浮按钮 ===== */
+.fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #4f46e5;
+    color: white;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+}
+
+/* ===== 弹窗 ===== */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-content input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.modal-content button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.save {
+    background: #4f46e5;
+    color: white;
+}
+
+.close {
+    background: #eee;
 }
 </style>
 </head>
@@ -120,65 +184,101 @@ footer {
 <div class="profile">
     <img src="images/avatar.jpg" class="avatar">
     <div class="name">安宁</div>
-    <div class="bio">my blog</div>
+    <div class="bio">My Personal Blog</div>
 </div>
 
-<!-- 搜索框 -->
+<!-- 搜索 -->
 <div class="toolbar">
-    <input type="text"
-           placeholder="搜索文章（标题 / 摘要 / 日期）…"
-           oninput="searchPosts(this.value)">
+    <input type="text" placeholder="搜索文章..." oninput="searchPosts(this.value)">
 </div>
 
-<!-- 博客列表 -->
-<div class="container">
+<!-- 内容 -->
+<div class="container" id="container"></div>
 
-<div class="post">
-        <h2><a href="posts/post-005.html">我的爱人</a></h2>
-        <div class="date">2026-01-24</div>
-        <div class="summary">我晃晃悠悠从高空落下/平平安安回到地上</div>
+<!-- 悬浮按钮 -->
+<button class="fab" onclick="openModal()">＋</button>
+
+<!-- 弹窗 -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <input id="title" placeholder="标题">
+        <input id="summary" placeholder="摘要">
+        <button class="save" onclick="addPost()">发布</button>
+        <button class="close" onclick="closeModal()">关闭</button>
     </div>
-
-    <div class="post">
-        <h2><a href="posts/post-001.html">日期功能！</a></h2>
-        <div class="date">2026-01-23</div>
-        <div class="summary">辛苦我和 gpt 老师了</div>
-    </div>
-
-    <div class="post">
-        <h2><a href="posts/post-002.html">更新日志【？】</a></h2>
-        <div class="date">2026-01-23</div>
-        <div class="summary">可以这么说吧嘻嘻嘻</div>
-    </div>
-
-    <div class="post">
-        <h2><a href="posts/post-003.html">这个苹果背景真是太有 feeling 了</a></h2>
-        <div class="date">2026-01-22</div>
-        <div class="summary">不仅是艺术啊我亲爱的</div>
-    </div>
-
-    <div class="post">
-        <h2><a href="posts/post-004.html">做了四个小时的博客!!!</a></h2>
-        <div class="date">2026-01-23</div>
-        <div class="summary">要特别感谢 ChatGPT 帮忙，爱你</div>
-    </div>
-
 </div>
-
-<footer>
-    © 2026 My Blog
-</footer>
 
 <script>
-function searchPosts(keyword) {
-    keyword = keyword.trim().toLowerCase();
-    document.querySelectorAll(".post").forEach(post => {
-        const text = post.innerText.toLowerCase();
-        post.style.display = text.includes(keyword) ? "block" : "none";
+let posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+/* 初始渲染 */
+function render(list = posts) {
+    const container = document.getElementById("container");
+    container.innerHTML = "";
+
+    list.forEach((post, index) => {
+        container.innerHTML += `
+        <div class="post">
+            <button class="delete" onclick="deletePost(${index})">删除</button>
+            <h2>${post.title}</h2>
+            <div class="date">${post.date}</div>
+            <div class="summary">${post.summary}</div>
+        </div>`;
     });
 }
+
+/* 发布 */
+function addPost() {
+    const title = document.getElementById("title").value;
+    const summary = document.getElementById("summary").value;
+
+    if (!title) return;
+
+    posts.unshift({
+        title,
+        summary,
+        date: new Date().toISOString().slice(0, 10)
+    });
+
+    localStorage.setItem("posts", JSON.stringify(posts));
+
+    closeModal();
+    render();
+}
+
+/* 删除 */
+function deletePost(index) {
+    posts.splice(index, 1);
+    localStorage.setItem("posts", JSON.stringify(posts));
+    render();
+}
+
+/* 搜索 */
+function searchPosts(keyword) {
+    keyword = keyword.toLowerCase();
+
+    const filtered = posts.filter(p =>
+        p.title.toLowerCase().includes(keyword) ||
+        p.summary.toLowerCase().includes(keyword)
+    );
+
+    render(filtered);
+}
+
+/* 弹窗 */
+function openModal() {
+    document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
+    document.getElementById("title").value = "";
+    document.getElementById("summary").value = "";
+}
+
+/* 初始化 */
+render();
 </script>
 
 </body>
 </html>
-
