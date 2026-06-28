@@ -18,14 +18,16 @@ body {
     color: #333;
 }
 
-/* ===== 头图（恢复图片模式） ===== */
+/* ===== 背景图 ===== */
 .header {
-    height: 380px;
+    height: 360px;
     background-image: url("images/header-bg.jpg");
     background-size: cover;
     background-position: center;
     position: relative;
 }
+
+/* 暗层 */
 .header::after {
     content: "";
     position: absolute;
@@ -33,10 +35,12 @@ body {
     background: rgba(0,0,0,0.35);
 }
 
-/* ===== 个人信息 ===== */
+/* ===== 头像（关键：浮在背景上层） ===== */
 .profile {
+    position: relative;
     text-align: center;
     margin-top: -80px;
+    z-index: 10;
 }
 
 .avatar {
@@ -45,6 +49,7 @@ body {
     border-radius: 50%;
     border: 5px solid #fff;
     object-fit: cover;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 .name {
@@ -109,7 +114,9 @@ body {
     cursor: pointer;
 }
 
-/* ===== 全屏编辑器 ===== */
+/* =========================
+   ✍️ 写作界面（全屏）
+========================= */
 .editor {
     display: none;
     position: fixed;
@@ -119,47 +126,69 @@ body {
     flex-direction: column;
 }
 
-.editor header {
-    padding: 16px;
+/* 顶部栏 */
+.editor-top {
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    padding: 14px 16px;
     border-bottom: 1px solid #eee;
 }
 
-.editor input, .editor textarea {
-    width: 100%;
+/* 淡雅退出按钮 */
+.exit {
+    font-size: 22px;
+    border: none;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+}
+
+.editor input {
+    padding: 16px;
     border: none;
     outline: none;
-    padding: 16px;
-    font-size: 16px;
+    font-size: 18px;
+    border-bottom: 1px solid #eee;
 }
 
 .editor textarea {
     flex: 1;
-    resize: none;
-}
-
-.editor button {
-    background: #111;
-    color: white;
+    padding: 16px;
     border: none;
-    padding: 10px 14px;
-    border-radius: 8px;
+    outline: none;
+    resize: none;
+    font-size: 15px;
+    line-height: 1.6;
 }
 
-/* ===== 阅读页 ===== */
+/* =========================
+   📖 阅读界面
+========================= */
 .reader {
     display: none;
     position: fixed;
     inset: 0;
-    background: #fff;
+    background: white;
     z-index: 1000;
     overflow: auto;
 }
 
+/* 阅读退出按钮 */
+.reader-exit {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    font-size: 22px;
+    border: none;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+}
+
 .reader-content {
     max-width: 700px;
-    margin: 80px auto;
+    margin: 90px auto;
     padding: 20px;
 }
 
@@ -176,20 +205,8 @@ body {
 
 .reader-text {
     margin-top: 20px;
-    line-height: 1.7;
+    line-height: 1.8;
     color: #444;
-}
-
-/* 阅读页淡删除 */
-.reader-delete {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.05);
-    border: none;
-    padding: 10px 14px;
-    border-radius: 10px;
-    cursor: pointer;
 }
 </style>
 </head>
@@ -198,6 +215,7 @@ body {
 
 <div class="header"></div>
 
+<!-- 头像（浮在背景上层） -->
 <div class="profile">
     <img src="images/avatar.jpg" class="avatar">
     <div class="name">安宁</div>
@@ -215,31 +233,39 @@ body {
 <!-- 发布按钮 -->
 <button class="fab" onclick="openEditor()">＋</button>
 
-<!-- 全屏编辑 -->
+<!-- =========================
+     ✍️ 写作界面
+========================= -->
 <div class="editor" id="editor">
-    <header>
-        <span>写文章</span>
+
+    <div class="editor-top">
+        <button class="exit" onclick="closeEditor()">×</button>
         <button onclick="publish()">发布</button>
-    </header>
+    </div>
+
     <input id="title" placeholder="标题">
     <textarea id="content" placeholder="开始写点什么..."></textarea>
 </div>
 
-<!-- 阅读页 -->
+<!-- =========================
+     📖 阅读界面
+========================= -->
 <div class="reader" id="reader">
+
+    <button class="reader-exit" onclick="closeReader()">×</button>
+
     <div class="reader-content">
         <div class="reader-title" id="rTitle"></div>
         <div class="reader-date" id="rDate"></div>
         <div class="reader-text" id="rText"></div>
     </div>
-    <button class="reader-delete" onclick="deleteCurrent()">删除</button>
 </div>
 
 <script>
 let posts = JSON.parse(localStorage.getItem("posts")) || [];
 let currentIndex = null;
 
-/* 列表渲染 */
+/* 渲染列表 */
 function render(list = posts) {
     const el = document.getElementById("list");
     el.innerHTML = "";
@@ -284,18 +310,16 @@ function openPost(i) {
     document.getElementById("reader").style.display = "block";
 }
 
-/* 删除（淡按钮） */
-function deleteCurrent() {
-    if (currentIndex === null) return;
-
-    posts.splice(currentIndex, 1);
-    localStorage.setItem("posts", JSON.stringify(posts));
-
-    closeReader();
-    render();
+/* 搜索 */
+function searchPosts(k) {
+    k = k.toLowerCase();
+    render(posts.filter(p =>
+        p.title.toLowerCase().includes(k) ||
+        p.content.toLowerCase().includes(k)
+    ));
 }
 
-/* 编辑器 */
+/* 编辑器控制 */
 function openEditor() {
     document.getElementById("editor").style.display = "flex";
 }
@@ -309,15 +333,6 @@ function closeEditor() {
 /* 阅读页关闭 */
 function closeReader() {
     document.getElementById("reader").style.display = "none";
-}
-
-/* 搜索 */
-function searchPosts(k) {
-    k = k.toLowerCase();
-    render(posts.filter(p =>
-        p.title.toLowerCase().includes(k) ||
-        p.content.toLowerCase().includes(k)
-    ));
 }
 
 /* 初始化 */
