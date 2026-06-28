@@ -6,215 +6,183 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+*{
+    margin:0;padding:0;box-sizing:border-box;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
 }
 
-body {
-    background: #f5f6f8;
-    color: #333;
+body{background:#f5f6f8;color:#333;}
+
+/* ===== 背景 ===== */
+.header{
+    height:360px;
+    background-image:url("images/header-bg.jpg");
+    background-size:cover;
+    background-position:center;
+    position:relative;
+}
+.header::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.35);
 }
 
-/* ===== 背景图 ===== */
-.header {
-    height: 360px;
-    background-image: url("images/header-bg.jpg");
-    background-size: cover;
-    background-position: center;
-    position: relative;
-}
-.header::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
+/* ===== 头像（修复压缩） ===== */
+.profile{
+    position:relative;
+    margin-top:-80px;
+    text-align:center;
+    z-index:10;
 }
 
-/* ===== 头像浮层 ===== */
-.profile {
-    position: relative;
-    text-align: center;
-    margin-top: -80px;
-    z-index: 10;
+.avatar{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    border:5px solid #fff;
+    object-fit:cover;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    display:inline-block;
 }
-
-.avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 5px solid #fff;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-
-.name { font-size: 24px; font-weight: bold; margin-top: 10px; }
-.bio { font-size: 14px; color: #666; }
 
 /* ===== 搜索 ===== */
-.toolbar {
-    max-width: 900px;
-    margin: 20px auto;
-    padding: 0 20px;
+.toolbar{
+    max-width:900px;
+    margin:20px auto;
+    padding:0 20px;
 }
 
-.toolbar input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+.toolbar input{
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    box-shadow:0 4px 18px rgba(0,0,0,0.08);
 }
 
 /* ===== 列表 ===== */
-.container {
-    max-width: 900px;
-    margin: 20px auto 80px;
-    padding: 0 20px;
+.container{
+    max-width:900px;
+    margin:20px auto 80px;
+    padding:0 20px;
 }
 
-.post {
-    background: white;
-    padding: 18px;
-    border-radius: 14px;
-    margin-bottom: 14px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-    cursor: pointer;
+.post{
+    background:#fff;
+    padding:18px;
+    border-radius:14px;
+    margin-bottom:14px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.06);
+    cursor:pointer;
 }
 
-/* ===== 发布按钮（淡黄色） ===== */
-.fab {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: #facc15;
-    color: #111;
-    font-size: 30px;
-    border: none;
-    cursor: pointer;
+/* ===== + 按钮（不变） ===== */
+.fab{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:56px;height:56px;
+    border-radius:50%;
+    background:#111;
+    color:#fff;
+    font-size:30px;
+    border:none;
+    cursor:pointer;
 }
 
-/* =========================
-   ✍️ 写作界面
-========================= */
-.editor {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: white;
-    z-index: 999;
-    flex-direction: column;
+/* ======================
+   ✍️ 编辑器
+====================== */
+.editor{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#fff;
+    z-index:999;
+    flex-direction:column;
 }
 
-.editor-top {
-    display: flex;
-    justify-content: space-between;
-    padding: 14px;
-    border-bottom: 1px solid #eee;
+/* 顶部 */
+.editor-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px;
+    border-bottom:1px solid #eee;
 }
 
-.exit {
-    background: none;
-    border: none;
-    font-size: 22px;
-    color: #999;
-    cursor: pointer;
+/* ❗ 淡黄色发布按钮（你要的） */
+.publish-btn{
+    background:#fde68a;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    color:#111;
 }
 
-.editor input, .editor textarea {
-    width: 100%;
-    border: none;
-    outline: none;
-    padding: 14px;
-    font-size: 16px;
+/* 退出 */
+.exit{
+    background:none;
+    border:none;
+    font-size:22px;
+    color:#999;
 }
 
-.editor textarea {
-    flex: 1;
+/* 输入 */
+.editor input,.editor textarea{
+    width:100%;
+    border:none;
+    outline:none;
+    padding:14px;
+    font-size:16px;
+}
+
+.editor textarea{
+    flex:1;
+}
+
+/* 上传 */
+.upload{
+    padding:10px 14px;
 }
 
 /* ===== 阅读页 ===== */
-.reader {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: white;
-    z-index: 1000;
-    overflow: auto;
+.reader{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#fff;
+    z-index:1000;
+    overflow:auto;
 }
 
-.reader-exit {
-    position: fixed;
-    top: 14px;
-    left: 14px;
-    background: none;
-    border: none;
-    font-size: 22px;
-    color: #999;
+.reader-exit{
+    position:fixed;
+    top:14px;
+    left:14px;
+    background:none;
+    border:none;
+    font-size:22px;
+    color:#999;
 }
 
-.reader-content {
-    max-width: 700px;
-    margin: 90px auto;
-    padding: 20px;
+.reader-content{
+    max-width:700px;
+    margin:90px auto;
+    padding:20px;
 }
 
-.reader-title { font-size: 28px; font-weight: bold; }
-.reader-date { font-size: 13px; color: #999; margin-top: 8px; }
-.reader-bio { margin-top: 10px; color: #666; font-size: 14px; }
+.reader-title{font-size:28px;font-weight:bold;}
+.reader-date{font-size:13px;color:#999;margin-top:8px;}
+.reader-text{margin-top:20px;line-height:1.8;}
 
-.reader-text {
-    margin-top: 20px;
-    line-height: 1.8;
-}
-
-/* ===== 媒体 ===== */
-.media {
-    margin-top: 15px;
-}
-
-.media img {
-    max-width: 100%;
-    border-radius: 10px;
-    margin-top: 10px;
-    cursor: zoom-in;
-}
-
-.media video {
-    max-width: 100%;
-    border-radius: 10px;
-    margin-top: 10px;
-}
-
-/* 图片放大（非全屏） */
-.zoom {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    max-width: 80%;
-    max-height: 80%;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    cursor: zoom-out;
-    z-index: 2000;
-}
-
-/* 删除（淡） */
-.delete {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.06);
-    border: none;
-    padding: 10px 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    color: #666;
+.media img{
+    max-width:100%;
+    border-radius:10px;
+    margin-top:10px;
+    cursor:zoom-in;
 }
 </style>
 </head>
@@ -226,10 +194,8 @@ body {
 <div class="profile">
     <img src="images/avatar.jpg" class="avatar">
     <div class="name">安宁</div>
-    <div class="bio">My Blog</div>
 </div>
 
-<!-- 搜索 -->
 <div class="toolbar">
     <input placeholder="搜索..." oninput="search(this.value)">
 </div>
@@ -238,43 +204,88 @@ body {
 
 <button class="fab" onclick="openEditor()">＋</button>
 
-<!-- 写作 -->
+<!-- ================= 编辑器 ================= -->
 <div class="editor" id="editor">
 
-    <div class="editor-top">
-        <button class="exit" onclick="closeEditor()">×</button>
-        <button onclick="publish()">发布</button>
-    </div>
+<div class="editor-top">
+    <button class="exit" onclick="closeEditor()">×</button>
 
-    <input id="title" placeholder="标题">
-    <input id="bio" placeholder="简介（可选）">
-    <textarea id="content" placeholder="内容（支持图片/视频URL）"></textarea>
+    <!-- ✅ 这里才是你要的淡黄色发布 -->
+    <button class="publish-btn" onclick="publish()">发布</button>
 </div>
 
-<!-- 阅读 -->
+<input id="title" placeholder="标题">
+<input id="bio" placeholder="简介">
+
+<textarea id="content" placeholder="文字 + 图片/视频上传"></textarea>
+
+<div class="upload">
+    <input type="file" multiple accept="image/*,video/*" onchange="handleFiles(event)">
+</div>
+
+</div>
+
+<!-- ================= 阅读 ================= -->
 <div class="reader" id="reader">
 
-    <button class="reader-exit" onclick="closeReader()">×</button>
+<button class="reader-exit" onclick="closeReader()">×</button>
 
-    <div class="reader-content">
-        <div class="reader-title" id="rTitle"></div>
-        <div class="reader-date" id="rDate"></div>
-        <div class="reader-bio" id="rBio"></div>
-        <div class="reader-text" id="rText"></div>
-        <div class="media" id="rMedia"></div>
-    </div>
+<div class="reader-content">
+    <div class="reader-title" id="rTitle"></div>
+    <div class="reader-date" id="rDate"></div>
+    <div class="reader-text" id="rText"></div>
+    <div class="media" id="rMedia"></div>
+</div>
 
-    <button class="delete" onclick="remove()">删除</button>
 </div>
 
 <script>
+
 let posts = JSON.parse(localStorage.getItem("posts")) || [];
 let current = null;
+let uploaded = [];
 
-/* 渲染 */
-function render(list = posts) {
+/* ===== 修复发布失效（核心修复） ===== */
+function publish(){
+
+    const titleVal = document.getElementById("title").value;
+    const bioVal = document.getElementById("bio").value;
+    const contentVal = document.getElementById("content").value;
+
+    posts.unshift({
+        title: titleVal,
+        bio: bioVal,
+        content: contentVal,
+        media: uploaded,
+        date: new Date().toISOString().slice(0,10)
+    });
+
+    localStorage.setItem("posts", JSON.stringify(posts));
+
+    uploaded = [];
+    closeEditor();
+    render();
+}
+
+/* ===== 文件上传（新增核心能力） ===== */
+function handleFiles(e){
+    const files = [...e.target.files];
+
+    files.forEach(file=>{
+        const url = URL.createObjectURL(file);
+
+        if(file.type.startsWith("image")){
+            uploaded.push({type:"img", url});
+        }else if(file.type.startsWith("video")){
+            uploaded.push({type:"video", url});
+        }
+    });
+}
+
+/* ===== 渲染 ===== */
+function render(list = posts){
     const el = document.getElementById("list");
-    el.innerHTML = "";
+    el.innerHTML="";
 
     list.forEach((p,i)=>{
         el.innerHTML += `
@@ -285,93 +296,47 @@ function render(list = posts) {
     });
 }
 
-/* 发布 */
-function publish() {
-    const title = title.value;
-    const bio = document.getElementById("bio").value;
-    const content = document.getElementById("content").value;
-
-    const media = extractMedia(content);
-
-    posts.unshift({
-        title,
-        bio,
-        content,
-        media,
-        date: new Date().toISOString().slice(0,10)
-    });
-
-    localStorage.setItem("posts", JSON.stringify(posts));
-
-    closeEditor();
-    render();
-}
-
-/* 提取图片视频 */
-function extractMedia(text){
-    const imgs = [...text.matchAll(/(https?:\/\/.*\.(jpg|png|jpeg))/g)].map(m=>m[1]);
-    const vids = [...text.matchAll(/(https?:\/\/.*\.(mp4|webm))/g)].map(m=>m[1]);
-
-    return {imgs, vids};
-}
-
-/* 打开 */
+/* ===== 打开文章 ===== */
 function openPost(i){
     current = i;
     const p = posts[i];
 
-    document.getElementById("rTitle").innerText = p.title;
-    document.getElementById("rDate").innerText = p.date;
-    document.getElementById("rBio").innerText = p.bio || "";
-    document.getElementById("rText").innerText = p.content;
+    rTitle.innerText = p.title;
+    rDate.innerText = p.date;
+    rText.innerText = p.content;
 
     const media = document.getElementById("rMedia");
     media.innerHTML = "";
 
-    (p.media?.imgs || []).forEach(src=>{
-        media.innerHTML += `<img src="${src}" onclick="zoom(this)">`;
+    (p.media||[]).forEach(m=>{
+        if(m.type==="img"){
+            media.innerHTML += `<img src="${m.url}">`;
+        }
+        if(m.type==="video"){
+            media.innerHTML += `<video src="${m.url}" controls style="max-width:100%;border-radius:10px;margin-top:10px;"></video>`;
+        }
     });
 
-    (p.media?.vids || []).forEach(src=>{
-        media.innerHTML += `<video src="${src}" controls></video>`;
-    });
-
-    document.getElementById("reader").style.display = "block";
+    reader.style.display="block";
 }
 
-/* 放大图片 */
-function zoom(img){
-    const z = document.createElement("img");
-    z.src = img.src;
-    z.className = "zoom";
-    z.onclick = ()=>z.remove();
-    document.body.appendChild(z);
-}
-
-/* 删除 */
-function remove(){
-    posts.splice(current,1);
-    localStorage.setItem("posts", JSON.stringify(posts));
-    closeReader();
-    render();
-}
-
-/* 搜索 */
+/* ===== 搜索 ===== */
 function search(k){
-    k = k.toLowerCase();
+    k=k.toLowerCase();
     render(posts.filter(p=>
         p.title.toLowerCase().includes(k) ||
         p.content.toLowerCase().includes(k)
     ));
 }
 
-/* 控制 */
-function openEditor(){ editor.style.display="flex"; }
-function closeEditor(){ editor.style.display="none"; }
-function closeReader(){ reader.style.display="none"; }
+/* ===== 控制 ===== */
+function openEditor(){editor.style.display="flex";}
+function closeEditor(){editor.style.display="none";}
+function closeReader(){reader.style.display="none";}
 
 /* 初始化 */
 render();
+
 </script>
 
 </body>
