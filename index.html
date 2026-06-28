@@ -26,8 +26,6 @@ body {
     background-position: center;
     position: relative;
 }
-
-/* 暗层 */
 .header::after {
     content: "";
     position: absolute;
@@ -35,7 +33,7 @@ body {
     background: rgba(0,0,0,0.35);
 }
 
-/* ===== 头像（关键：浮在背景上层） ===== */
+/* ===== 头像浮层 ===== */
 .profile {
     position: relative;
     text-align: center;
@@ -48,20 +46,11 @@ body {
     height: 120px;
     border-radius: 50%;
     border: 5px solid #fff;
-    object-fit: cover;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-.name {
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-.bio {
-    font-size: 14px;
-    color: #666;
-}
+.name { font-size: 24px; font-weight: bold; margin-top: 10px; }
+.bio { font-size: 14px; color: #666; }
 
 /* ===== 搜索 ===== */
 .toolbar {
@@ -92,14 +81,9 @@ body {
     margin-bottom: 14px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.06);
     cursor: pointer;
-    transition: 0.2s;
 }
 
-.post:hover {
-    transform: translateY(-3px);
-}
-
-/* ===== 悬浮按钮 ===== */
+/* ===== 发布按钮（淡黄色） ===== */
 .fab {
     position: fixed;
     right: 20px;
@@ -107,15 +91,15 @@ body {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: #111;
-    color: white;
+    background: #facc15;
+    color: #111;
     font-size: 30px;
     border: none;
     cursor: pointer;
 }
 
 /* =========================
-   ✍️ 写作界面（全屏）
+   ✍️ 写作界面
 ========================= */
 .editor {
     display: none;
@@ -126,45 +110,34 @@ body {
     flex-direction: column;
 }
 
-/* 顶部栏 */
 .editor-top {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
+    padding: 14px;
     border-bottom: 1px solid #eee;
 }
 
-/* 淡雅退出按钮 */
 .exit {
-    font-size: 22px;
+    background: none;
     border: none;
-    background: transparent;
+    font-size: 22px;
     color: #999;
     cursor: pointer;
 }
 
-.editor input {
-    padding: 16px;
+.editor input, .editor textarea {
+    width: 100%;
     border: none;
     outline: none;
-    font-size: 18px;
-    border-bottom: 1px solid #eee;
+    padding: 14px;
+    font-size: 16px;
 }
 
 .editor textarea {
     flex: 1;
-    padding: 16px;
-    border: none;
-    outline: none;
-    resize: none;
-    font-size: 15px;
-    line-height: 1.6;
 }
 
-/* =========================
-   📖 阅读界面
-========================= */
+/* ===== 阅读页 ===== */
 .reader {
     display: none;
     position: fixed;
@@ -174,16 +147,14 @@ body {
     overflow: auto;
 }
 
-/* 阅读退出按钮 */
 .reader-exit {
     position: fixed;
     top: 14px;
     left: 14px;
-    font-size: 22px;
+    background: none;
     border: none;
-    background: transparent;
+    font-size: 22px;
     color: #999;
-    cursor: pointer;
 }
 
 .reader-content {
@@ -192,21 +163,58 @@ body {
     padding: 20px;
 }
 
-.reader-title {
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.reader-date {
-    font-size: 13px;
-    color: #999;
-    margin-top: 8px;
-}
+.reader-title { font-size: 28px; font-weight: bold; }
+.reader-date { font-size: 13px; color: #999; margin-top: 8px; }
+.reader-bio { margin-top: 10px; color: #666; font-size: 14px; }
 
 .reader-text {
     margin-top: 20px;
     line-height: 1.8;
-    color: #444;
+}
+
+/* ===== 媒体 ===== */
+.media {
+    margin-top: 15px;
+}
+
+.media img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
+    cursor: zoom-in;
+}
+
+.media video {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+/* 图片放大（非全屏） */
+.zoom {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    cursor: zoom-out;
+    z-index: 2000;
+}
+
+/* 删除（淡） */
+.delete {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.06);
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #666;
 }
 </style>
 </head>
@@ -215,7 +223,6 @@ body {
 
 <div class="header"></div>
 
-<!-- 头像（浮在背景上层） -->
 <div class="profile">
     <img src="images/avatar.jpg" class="avatar">
     <div class="name">安宁</div>
@@ -224,18 +231,14 @@ body {
 
 <!-- 搜索 -->
 <div class="toolbar">
-    <input placeholder="搜索文章..." oninput="searchPosts(this.value)">
+    <input placeholder="搜索..." oninput="search(this.value)">
 </div>
 
-<!-- 列表 -->
 <div class="container" id="list"></div>
 
-<!-- 发布按钮 -->
 <button class="fab" onclick="openEditor()">＋</button>
 
-<!-- =========================
-     ✍️ 写作界面
-========================= -->
+<!-- 写作 -->
 <div class="editor" id="editor">
 
     <div class="editor-top">
@@ -244,12 +247,11 @@ body {
     </div>
 
     <input id="title" placeholder="标题">
-    <textarea id="content" placeholder="开始写点什么..."></textarea>
+    <input id="bio" placeholder="简介（可选）">
+    <textarea id="content" placeholder="内容（支持图片/视频URL）"></textarea>
 </div>
 
-<!-- =========================
-     📖 阅读界面
-========================= -->
+<!-- 阅读 -->
 <div class="reader" id="reader">
 
     <button class="reader-exit" onclick="closeReader()">×</button>
@@ -257,38 +259,45 @@ body {
     <div class="reader-content">
         <div class="reader-title" id="rTitle"></div>
         <div class="reader-date" id="rDate"></div>
+        <div class="reader-bio" id="rBio"></div>
         <div class="reader-text" id="rText"></div>
+        <div class="media" id="rMedia"></div>
     </div>
+
+    <button class="delete" onclick="remove()">删除</button>
 </div>
 
 <script>
 let posts = JSON.parse(localStorage.getItem("posts")) || [];
-let currentIndex = null;
+let current = null;
 
-/* 渲染列表 */
+/* 渲染 */
 function render(list = posts) {
     const el = document.getElementById("list");
     el.innerHTML = "";
 
-    list.forEach((p, i) => {
+    list.forEach((p,i)=>{
         el.innerHTML += `
         <div class="post" onclick="openPost(${i})">
             <h3>${p.title}</h3>
-            <div style="font-size:12px;color:#999;margin-top:6px">${p.date}</div>
+            <div style="font-size:12px;color:#999">${p.date}</div>
         </div>`;
     });
 }
 
 /* 发布 */
 function publish() {
-    const title = document.getElementById("title").value;
+    const title = title.value;
+    const bio = document.getElementById("bio").value;
     const content = document.getElementById("content").value;
 
-    if (!title) return;
+    const media = extractMedia(content);
 
     posts.unshift({
         title,
+        bio,
         content,
+        media,
         date: new Date().toISOString().slice(0,10)
     });
 
@@ -298,42 +307,68 @@ function publish() {
     render();
 }
 
-/* 打开文章 */
-function openPost(i) {
-    currentIndex = i;
+/* 提取图片视频 */
+function extractMedia(text){
+    const imgs = [...text.matchAll(/(https?:\/\/.*\.(jpg|png|jpeg))/g)].map(m=>m[1]);
+    const vids = [...text.matchAll(/(https?:\/\/.*\.(mp4|webm))/g)].map(m=>m[1]);
+
+    return {imgs, vids};
+}
+
+/* 打开 */
+function openPost(i){
+    current = i;
     const p = posts[i];
 
     document.getElementById("rTitle").innerText = p.title;
     document.getElementById("rDate").innerText = p.date;
+    document.getElementById("rBio").innerText = p.bio || "";
     document.getElementById("rText").innerText = p.content;
+
+    const media = document.getElementById("rMedia");
+    media.innerHTML = "";
+
+    (p.media?.imgs || []).forEach(src=>{
+        media.innerHTML += `<img src="${src}" onclick="zoom(this)">`;
+    });
+
+    (p.media?.vids || []).forEach(src=>{
+        media.innerHTML += `<video src="${src}" controls></video>`;
+    });
 
     document.getElementById("reader").style.display = "block";
 }
 
+/* 放大图片 */
+function zoom(img){
+    const z = document.createElement("img");
+    z.src = img.src;
+    z.className = "zoom";
+    z.onclick = ()=>z.remove();
+    document.body.appendChild(z);
+}
+
+/* 删除 */
+function remove(){
+    posts.splice(current,1);
+    localStorage.setItem("posts", JSON.stringify(posts));
+    closeReader();
+    render();
+}
+
 /* 搜索 */
-function searchPosts(k) {
+function search(k){
     k = k.toLowerCase();
-    render(posts.filter(p =>
+    render(posts.filter(p=>
         p.title.toLowerCase().includes(k) ||
         p.content.toLowerCase().includes(k)
     ));
 }
 
-/* 编辑器控制 */
-function openEditor() {
-    document.getElementById("editor").style.display = "flex";
-}
-
-function closeEditor() {
-    document.getElementById("editor").style.display = "none";
-    document.getElementById("title").value = "";
-    document.getElementById("content").value = "";
-}
-
-/* 阅读页关闭 */
-function closeReader() {
-    document.getElementById("reader").style.display = "none";
-}
+/* 控制 */
+function openEditor(){ editor.style.display="flex"; }
+function closeEditor(){ editor.style.display="none"; }
+function closeReader(){ reader.style.display="none"; }
 
 /* 初始化 */
 render();
