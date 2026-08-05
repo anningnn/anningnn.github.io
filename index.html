@@ -110,6 +110,14 @@
             margin-bottom: 2px;
             color: #1a1a1a;
         }
+        .post-left .bio {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         .post-left .date {
             font-size: 12px;
             color: #999;
@@ -159,7 +167,6 @@
             background: #fee8e8;
         }
 
-        /* ===== 批注按钮（根据有无批注变色） ===== */
         .post-note-btn {
             background: none;
             border: none;
@@ -169,12 +176,10 @@
             border-radius: 8px;
             transition: all 0.2s;
             line-height: 1.4;
+            color: #ccc;
         }
         .post-note-btn.has-note {
             color: #2d7aff;
-        }
-        .post-note-btn.no-note {
-            color: #ccc;
         }
         .post-note-btn.has-note:hover {
             background: #eaf1ff;
@@ -309,7 +314,6 @@
             background: #f0f0f0;
         }
 
-        /* 添加批注按钮（阅读页） */
         .reader-add-note {
             position: fixed;
             bottom: 30px;
@@ -358,8 +362,37 @@
             margin-top: 8px;
         }
 
+        /* ===== 媒体区域（图片/视频，位于正文上方） ===== */
+        .reader-media {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 12px 0 16px 0;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            /* 单张图片时不滚动（居中）通过JS添加 .single 类 */
+        }
+        .reader-media.single {
+            overflow-x: hidden;
+            justify-content: center;
+        }
+        .reader-media img,
+        .reader-media video {
+            flex: 0 0 auto;
+            max-height: 300px;
+            width: auto;
+            border-radius: 10px;
+            scroll-snap-align: start;
+            cursor: zoom-in;
+            transition: transform 0.15s;
+        }
+        .reader-media img:hover,
+        .reader-media video:hover {
+            transform: scale(1.02);
+        }
+
         .reader-text {
-            margin-top: 24px;
+            margin-top: 10px;
             line-height: 1.8;
             font-size: 16px;
             white-space: pre-wrap;
@@ -376,18 +409,24 @@
             background: #ffe066;
         }
 
-        .reader-media {
-            margin-top: 20px;
+        /* ===== 图片放大模态框 ===== */
+        .image-zoom {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
         }
-        .reader-media img,
-        .reader-media video {
-            max-width: 100%;
-            border-radius: 10px;
-            margin-top: 12px;
-            display: block;
-        }
-        .reader-media img {
-            cursor: zoom-in;
+        .image-zoom img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            object-fit: contain;
+            cursor: default;
         }
 
         /* ===== 右侧批注面板 ===== */
@@ -507,6 +546,10 @@
                 padding: 10px 16px;
                 font-size: 14px;
             }
+            .reader-media img,
+            .reader-media video {
+                max-height: 200px;
+            }
         }
     </style>
 </head>
@@ -552,14 +595,16 @@
 
         <button class="reader-exit" onclick="closeReader()">×</button>
 
-        <!-- 添加批注浮动按钮 -->
         <button class="reader-add-note" onclick="addNoteFromSelection()">✏️ 添加批注</button>
 
         <div class="reader-content">
             <div class="reader-title" id="rTitle"></div>
             <div class="reader-date" id="rDate"></div>
-            <div class="reader-text" id="rText"></div>
+
+            <!-- 媒体区域（图片/视频）现在位于正文上方 -->
             <div class="reader-media" id="rMedia"></div>
+
+            <div class="reader-text" id="rText"></div>
         </div>
 
     </div>
@@ -575,16 +620,20 @@
         </div>
     </div>
 
+    <!-- ===== 图片放大模态框 ===== -->
+    <div class="image-zoom" id="imageZoom" onclick="closeZoom()">
+        <img id="zoomImg" src="" alt="放大图片">
+    </div>
+
     <script>
         // ============================================================
         //  数据层
         // ============================================================
         let posts = JSON.parse(localStorage.getItem("posts")) || [];
 
-        // 迁移旧数据：确保每个文章有 notes 数组
         posts = posts.map(p => {
             if (!p.id) p.id = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-            if (!p.notes) p.notes = []; // 批注数组
+            if (!p.notes) p.notes = [];
             return p;
         });
         localStorage.setItem("posts", JSON.stringify(posts));
@@ -616,6 +665,13 @@
                 titleDiv.textContent = p.title;
                 left.appendChild(titleDiv);
 
+                if (p.bio) {
+                    const bioDiv = document.createElement("div");
+                    bioDiv.className = "bio";
+                    bioDiv.textContent = p.bio;
+                    left.appendChild(bioDiv);
+                }
+
                 const metaDiv = document.createElement("div");
                 metaDiv.style.display = "flex";
                 metaDiv.style.alignItems = "center";
@@ -627,7 +683,6 @@
                 dateSpan.textContent = p.date;
                 metaDiv.appendChild(dateSpan);
 
-                // 显示批注预览（第一条批注的片段）
                 if (p.notes && p.notes.length > 0) {
                     const preview = document.createElement("span");
                     preview.className = "note-preview";
@@ -643,12 +698,10 @@
                 const actions = document.createElement("div");
                 actions.className = "post-actions";
 
-                // 批注按钮：根据是否有批注变色
                 const noteBtn = document.createElement("button");
                 noteBtn.className = "post-note-btn";
                 noteBtn.innerHTML = "✏️";
                 noteBtn.setAttribute("aria-label", "批注状态");
-                // 变色逻辑
                 if (p.notes && p.notes.length > 0) {
                     noteBtn.classList.add("has-note");
                 } else {
@@ -656,12 +709,10 @@
                 }
                 noteBtn.onclick = function(e) {
                     e.stopPropagation();
-                    // 点击批注按钮可以快速打开阅读页并聚焦到批注？简单起见，直接打开文章
                     openPost(p.id);
                 };
                 actions.appendChild(noteBtn);
 
-                // 删除按钮
                 const delBtn = document.createElement("button");
                 delBtn.className = "post-delete";
                 delBtn.innerHTML = "✕";
@@ -699,7 +750,7 @@
         }
 
         // ============================================================
-        //  打开阅读页（带批注高亮）
+        //  打开阅读页（带批注高亮 + 媒体置于上方）
         // ============================================================
         function openPost(id) {
             const p = posts.find(item => item.id === id);
@@ -709,7 +760,6 @@
             }
             currentId = id;
 
-            // 设置标题（带批注高亮）
             const titleEl = document.getElementById("rTitle");
             const dateEl = document.getElementById("rDate");
             const textEl = document.getElementById("rText");
@@ -717,19 +767,14 @@
 
             dateEl.textContent = p.date;
 
-            // 处理标题和正文中的批注高亮
             const notes = p.notes || [];
-            // 构建高亮 HTML：将原文中的批注原文用 span 包裹
             const highlightText = (text, notes) => {
                 if (!notes || notes.length === 0) return text;
-                // 为避免重复替换导致问题，我们按原文长度从长到短排序
                 const sorted = [...notes].sort((a, b) => b.originalText.length - a.originalText.length);
                 let result = text;
-                // 使用正则替换，但需要转义特殊字符
                 sorted.forEach(n => {
                     const escaped = n.originalText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                     const regex = new RegExp(escaped, 'g');
-                    // 用带有 data-note-id 的 span 替换
                     result = result.replace(regex, match => {
                         return `<span class="note-highlight" data-note-id="${n.id}" data-original="${encodeURIComponent(match)}">${match}</span>`;
                     });
@@ -737,22 +782,20 @@
                 return result;
             };
 
-            // 对标题和正文进行高亮
             const titleHTML = highlightText(p.title, notes);
             const contentHTML = highlightText(p.content, notes);
 
             titleEl.innerHTML = titleHTML;
             textEl.innerHTML = contentHTML;
 
-            // 绑定点击高亮文本事件（委托）
+            // 绑定高亮点击
             const readerContent = document.querySelector('.reader-content');
-            // 移除旧监听，使用新监听
             readerContent.querySelectorAll('.note-highlight').forEach(el => {
                 el.removeEventListener('click', handleHighlightClick);
                 el.addEventListener('click', handleHighlightClick);
             });
 
-            // 媒体
+            // ----- 媒体区域（图片/视频）置于正文上方 -----
             mediaEl.innerHTML = "";
             if (p.media && p.media.length > 0) {
                 p.media.forEach(m => {
@@ -760,48 +803,60 @@
                         const img = document.createElement("img");
                         img.src = m.url;
                         img.alt = "图片";
+                        img.loading = "lazy";
+                        // 点击放大
+                        img.onclick = function(e) {
+                            e.stopPropagation();
+                            openZoom(this.src);
+                        };
                         mediaEl.appendChild(img);
                     } else if (m.type === "video") {
                         const video = document.createElement("video");
                         video.src = m.url;
                         video.controls = true;
-                        video.style.maxWidth = "100%";
+                        video.style.maxHeight = "300px";
                         video.style.borderRadius = "10px";
-                        video.style.marginTop = "12px";
+                        video.style.flex = "0 0 auto";
                         mediaEl.appendChild(video);
                     }
                 });
+
+                // 根据媒体数量决定是否添加 'single' 类（仅一张图片且无视频？或总数=1）
+                // 更准确：如果只有一项且是图片，则设置为单张模式；若有视频或多项则滚动
+                const items = mediaEl.children;
+                if (items.length === 1 && items[0].tagName === 'IMG') {
+                    mediaEl.classList.add('single');
+                } else {
+                    mediaEl.classList.remove('single');
+                }
+            } else {
+                mediaEl.classList.remove('single');
             }
 
             document.getElementById("reader").style.display = "block";
             document.body.style.overflow = "hidden";
-            // 关闭右侧面板
             closeNotePanel();
         }
 
-        // 高亮点击处理
+        // ============================================================
+        //  批注高亮点击
+        // ============================================================
         function handleHighlightClick(e) {
             const el = e.currentTarget;
             const noteId = el.dataset.noteId;
             const original = decodeURIComponent(el.dataset.original || '');
-            // 在 currentId 对应的文章中找到批注
             const post = posts.find(p => p.id === currentId);
             if (!post) return;
             const note = post.notes.find(n => n.id === noteId);
-            if (!note) {
-                // 若找不到，尝试用原文匹配
-                const found = post.notes.find(n => n.originalText === original);
-                if (found) {
-                    showNotePanel(found);
-                } else {
-                    alert('批注数据异常');
-                }
-            } else {
+            if (note) {
                 showNotePanel(note);
+            } else {
+                const found = post.notes.find(n => n.originalText === original);
+                if (found) showNotePanel(found);
+                else alert('批注数据异常');
             }
         }
 
-        // 显示右侧面板
         function showNotePanel(note) {
             document.getElementById("panelOriginal").textContent = note.originalText;
             document.getElementById("panelNote").textContent = note.noteText;
@@ -813,7 +868,7 @@
         }
 
         // ============================================================
-        //  添加批注（基于当前选中文本）
+        //  添加批注
         // ============================================================
         function addNoteFromSelection() {
             if (!currentId) {
@@ -826,7 +881,6 @@
                 return;
             }
 
-            // 获取当前选中的文本（在阅读页中）
             const sel = window.getSelection();
             const selectedText = sel.toString().trim();
             if (!selectedText) {
@@ -834,23 +888,20 @@
                 return;
             }
 
-            // 检查是否在阅读页内（防止选中外部）
             const readerEl = document.getElementById("reader");
             if (!readerEl.contains(sel.anchorNode)) {
                 alert("请选中文章内容中的文本");
                 return;
             }
 
-            // 输入批注内容
             const noteText = prompt("请输入批注内容：");
-            if (noteText === null) return; // 取消
+            if (noteText === null) return;
             const trimmedNote = noteText.trim();
             if (!trimmedNote) {
                 alert("批注内容不能为空");
                 return;
             }
 
-            // 创建批注对象
             const note = {
                 id: Date.now() + '_' + Math.random().toString(36).slice(2, 7),
                 originalText: selectedText,
@@ -859,24 +910,32 @@
             post.notes.push(note);
             localStorage.setItem("posts", JSON.stringify(posts));
 
-            // 重新渲染阅读页以显示高亮
-            // 但为了不丢失当前滚动，直接调用 openPost 刷新
             openPost(currentId);
-            // 高亮更新后，自动打开该批注的面板
-            // 查找刚添加的高亮元素
             setTimeout(() => {
                 const highlights = document.querySelectorAll('.note-highlight');
                 for (let el of highlights) {
                     if (el.dataset.noteId === note.id) {
                         el.scrollIntoView({ block: 'center' });
-                        // 模拟点击显示面板
                         handleHighlightClick({ currentTarget: el });
                         break;
                     }
                 }
-                // 更新列表中的批注按钮颜色
                 render();
             }, 50);
+        }
+
+        // ============================================================
+        //  图片放大
+        // ============================================================
+        function openZoom(src) {
+            document.getElementById('zoomImg').src = src;
+            document.getElementById('imageZoom').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeZoom() {
+            document.getElementById('imageZoom').style.display = 'none';
+            document.body.style.overflow = '';
         }
 
         // ============================================================
@@ -895,7 +954,7 @@
         }
 
         // ============================================================
-        //  编辑器相关（发布、文件上传）
+        //  编辑器
         // ============================================================
         function publish() {
             const titleVal = document.getElementById("title").value.trim();
@@ -949,14 +1008,20 @@
             document.body.style.overflow = "";
             currentId = null;
             closeNotePanel();
+            closeZoom();
         }
 
-        // ESC 关闭
         document.addEventListener("keydown", function(e) {
             if (e.key === "Escape") {
-                if (document.getElementById("reader").style.display === "block") closeReader();
-                else if (document.getElementById("editor").style.display === "flex") closeEditor();
-                else if (document.getElementById("notePanel").classList.contains("open")) closeNotePanel();
+                if (document.getElementById("imageZoom").style.display === "flex") {
+                    closeZoom();
+                } else if (document.getElementById("reader").style.display === "block") {
+                    closeReader();
+                } else if (document.getElementById("editor").style.display === "flex") {
+                    closeEditor();
+                } else if (document.getElementById("notePanel").classList.contains("open")) {
+                    closeNotePanel();
+                }
             }
         });
 
