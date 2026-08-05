@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>My Blog · 批注增强</title>
+    <title>My Blog · 批注版</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
@@ -16,6 +16,7 @@
         body {
             background: #f5f6f8;
             color: #333;
+            transition: margin-right 0.25s;
         }
 
         /* ===== 背景 ===== */
@@ -112,8 +113,26 @@
         .post-left .date {
             font-size: 12px;
             color: #999;
+            margin-right: 6px;
         }
-        /* 不再显示批注文本标签 */
+        .post-left .note-preview {
+            font-size: 13px;
+            color: #888;
+            font-style: italic;
+            background: #f4f4f6;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            margin-top: 3px;
+        }
+        .post-left .note-preview:empty {
+            display: none;
+        }
 
         /* 右侧按钮组 */
         .post-actions {
@@ -124,7 +143,6 @@
             margin-left: 12px;
         }
 
-        /* ===== 缩小后的删除按钮 ===== */
         .post-delete {
             background: none;
             border: none;
@@ -141,7 +159,7 @@
             background: #fee8e8;
         }
 
-        /* ===== 批注按钮（根据批注变色） ===== */
+        /* ===== 批注按钮（根据有无批注变色） ===== */
         .post-note-btn {
             background: none;
             border: none;
@@ -151,13 +169,18 @@
             border-radius: 8px;
             transition: all 0.2s;
             line-height: 1.4;
-            color: #bbb; /* 默认灰色 */
         }
         .post-note-btn.has-note {
-            color: #2d7aff; /* 有批注变为蓝色 */
+            color: #2d7aff;
         }
-        .post-note-btn:hover {
+        .post-note-btn.no-note {
+            color: #ccc;
+        }
+        .post-note-btn.has-note:hover {
             background: #eaf1ff;
+        }
+        .post-note-btn.no-note:hover {
+            background: #f0f0f0;
         }
 
         /* ===== + 按钮 ===== */
@@ -181,9 +204,7 @@
             transform: scale(1.06);
         }
 
-        /* ======================
-           ✍️ 编辑器
-        ====================== */
+        /* ===== 编辑器 ===== */
         .editor {
             display: none;
             position: fixed;
@@ -259,31 +280,21 @@
             font-size: 14px;
         }
 
-        /* ========================================
-           阅读页 + 批注面板
-        ======================================== */
+        /* ===== 阅读页 ===== */
         .reader {
             display: none;
             position: fixed;
             inset: 0;
             background: #fff;
             z-index: 1000;
-            overflow: hidden;
-            flex-direction: row;
-        }
-
-        /* 左侧主内容 */
-        .reader-main {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px 40px 60px;
-            background: #fff;
+            overflow: auto;
+            padding-bottom: 60px;
         }
 
         .reader-exit {
-            position: sticky;
+            position: fixed;
             top: 14px;
-            left: 0;
+            left: 14px;
             background: none;
             border: none;
             font-size: 26px;
@@ -292,34 +303,79 @@
             z-index: 10;
             padding: 4px 8px;
             border-radius: 8px;
-            float: left;
         }
         .reader-exit:hover {
             color: #333;
             background: #f0f0f0;
         }
 
+        /* 添加批注按钮（阅读页） */
+        .reader-add-note {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #111;
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 20px;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            z-index: 20;
+            transition: transform 0.2s;
+        }
+        .reader-add-note:hover {
+            transform: scale(1.04);
+        }
+
+        .reader-content {
+            max-width: 700px;
+            margin: 80px auto 20px;
+            padding: 20px 24px 40px;
+        }
+
         .reader-title {
             font-size: 28px;
             font-weight: bold;
             line-height: 1.3;
-            margin-top: 10px;
-            clear: both;
-            padding: 4px 0;
+            margin-bottom: 10px;
         }
+        .reader-title .note-highlight {
+            background: #fff3b0;
+            border-radius: 4px;
+            padding: 0 2px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .reader-title .note-highlight:hover {
+            background: #ffe066;
+        }
+
         .reader-date {
             font-size: 13px;
             color: #999;
             margin-top: 8px;
-            margin-bottom: 20px;
         }
+
         .reader-text {
+            margin-top: 24px;
             line-height: 1.8;
             font-size: 16px;
             white-space: pre-wrap;
             word-break: break-word;
-            padding: 4px 0;
         }
+        .reader-text .note-highlight {
+            background: #fff3b0;
+            border-radius: 4px;
+            padding: 0 2px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .reader-text .note-highlight:hover {
+            background: #ffe066;
+        }
+
         .reader-media {
             margin-top: 20px;
         }
@@ -330,117 +386,65 @@
             margin-top: 12px;
             display: block;
         }
-
-        /* 高亮批注样式 */
-        .annotated {
-            background-color: #fff3cd;
-            border-radius: 3px;
-            padding: 1px 2px;
-            cursor: pointer;
-            transition: background 0.2s;
-            border-bottom: 2px solid #ffb347;
-        }
-        .annotated:hover {
-            background-color: #ffe69c;
+        .reader-media img {
+            cursor: zoom-in;
         }
 
-        /* 右侧批注面板 */
-        .reader-annotation-panel {
-            width: 320px;
-            background: #fafbfc;
-            border-left: 1px solid #eaeef2;
-            padding: 24px 18px;
+        /* ===== 右侧批注面板 ===== */
+        .note-panel {
+            position: fixed;
+            top: 0;
+            right: -380px;
+            width: 360px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -4px 0 30px rgba(0,0,0,0.1);
+            z-index: 2000;
+            transition: right 0.3s ease;
             overflow-y: auto;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            padding: 30px 24px;
+            border-left: 1px solid #eee;
         }
-        .annotation-panel-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #555;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
+        .note-panel.open {
+            right: 0;
         }
-        .annotation-item {
-            background: #fff;
-            border-radius: 10px;
-            padding: 14px 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border-left: 4px solid #ffb347;
-        }
-        .annotation-item .original {
-            color: #888;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 6px;
-            padding-left: 4px;
-            border-left: 2px solid #eee;
-            padding-left: 10px;
-        }
-        .annotation-item .note-text {
-            font-size: 15px;
-            color: #1e2a3a;
-            font-weight: 500;
-            line-height: 1.5;
-            padding-top: 4px;
-        }
-        .annotation-empty {
-            color: #aaa;
-            font-size: 14px;
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        /* 添加批注按钮（浮动） */
-        .add-annotation-btn {
-            position: sticky;
-            bottom: 20px;
-            left: 100%;
-            transform: translateX(-120%);
-            background: #111;
-            color: #fff;
+        .note-panel .panel-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
             border: none;
-            padding: 10px 18px;
-            border-radius: 40px;
-            font-size: 14px;
+            font-size: 28px;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            transition: background 0.2s;
-            z-index: 10;
-            white-space: nowrap;
+            color: #999;
         }
-        .add-annotation-btn:hover {
-            background: #2d2d2d;
+        .note-panel .panel-close:hover {
+            color: #333;
         }
-        .add-annotation-btn:disabled {
-            opacity: 0.4;
-            pointer-events: none;
+        .note-panel .panel-original {
+            color: #888;
+            font-size: 15px;
+            line-height: 1.6;
+            background: #f8f8fa;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            border-left: 4px solid #ddd;
         }
-
-        /* 阅读页删除按钮（底部） */
-        .reader-delete {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: flex-end;
+        .note-panel .panel-note {
+            color: #1a1a1a;
+            font-size: 17px;
+            line-height: 1.7;
+            padding: 12px 16px;
+            background: #f0f4ff;
+            border-radius: 10px;
+            border-left: 4px solid #2d7aff;
         }
-        .reader-delete button {
-            background: #fff;
-            border: 1px solid #e74c3c;
-            color: #e74c3c;
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        .reader-delete button:hover {
-            background: #e74c3c;
-            color: #fff;
+        .note-panel .panel-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
         }
 
         /* ===== 空状态 ===== */
@@ -452,29 +456,6 @@
         }
 
         /* ===== 响应式 ===== */
-        @media (max-width: 800px) {
-            .reader {
-                flex-direction: column;
-            }
-            .reader-annotation-panel {
-                width: 100%;
-                max-height: 40vh;
-                border-left: none;
-                border-top: 1px solid #eaeef2;
-                padding: 16px;
-            }
-            .reader-main {
-                padding: 20px 18px 30px;
-            }
-            .add-annotation-btn {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                transform: none;
-                left: auto;
-            }
-        }
-
         @media (max-width: 600px) {
             .header {
                 height: 220px;
@@ -488,6 +469,10 @@
             }
             .name {
                 font-size: 17px;
+            }
+            .reader-content {
+                padding: 16px 18px 30px;
+                margin-top: 60px;
             }
             .reader-title {
                 font-size: 22px;
@@ -512,6 +497,16 @@
                 height: 50px;
                 font-size: 26px;
             }
+            .note-panel {
+                width: 100%;
+                right: -100%;
+            }
+            .reader-add-note {
+                right: 16px;
+                bottom: 16px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -533,7 +528,7 @@
 
     <button class="fab" onclick="openEditor()">＋</button>
 
-    <!-- ================= 编辑器 ================= -->
+    <!-- ===== 编辑器 ===== -->
     <div class="editor" id="editor">
 
         <div class="editor-top">
@@ -552,108 +547,53 @@
 
     </div>
 
-    <!-- ================= 阅读页（含批注面板） ================= -->
+    <!-- ===== 阅读页 ===== -->
     <div class="reader" id="reader">
 
-        <div class="reader-main" id="readerMain">
-            <button class="reader-exit" onclick="closeReader()">×</button>
+        <button class="reader-exit" onclick="closeReader()">×</button>
+
+        <!-- 添加批注浮动按钮 -->
+        <button class="reader-add-note" onclick="addNoteFromSelection()">✏️ 添加批注</button>
+
+        <div class="reader-content">
             <div class="reader-title" id="rTitle"></div>
             <div class="reader-date" id="rDate"></div>
             <div class="reader-text" id="rText"></div>
             <div class="reader-media" id="rMedia"></div>
-
-            <div class="reader-delete">
-                <button onclick="deleteCurrentPost()">🗑 删除这篇文章</button>
-            </div>
-
-            <!-- 浮动添加批注按钮 -->
-            <button class="add-annotation-btn" id="addAnnoBtn" onclick="addAnnotation()">✏️ 添加批注</button>
-        </div>
-
-        <!-- 右侧批注面板 -->
-        <div class="reader-annotation-panel" id="annotationPanel">
-            <div class="annotation-panel-title">📌 批注列表</div>
-            <div id="annotationList"></div>
         </div>
 
     </div>
 
+    <!-- ===== 右侧批注面板 ===== -->
+    <div class="note-panel" id="notePanel">
+        <button class="panel-close" onclick="closeNotePanel()">×</button>
+        <div id="panelContent">
+            <div class="panel-label">📄 原文</div>
+            <div class="panel-original" id="panelOriginal"></div>
+            <div class="panel-label" style="margin-top:18px;">✏️ 批注</div>
+            <div class="panel-note" id="panelNote"></div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
-        //  1. 数据加载  +  兼容旧数据（增加 annotations 字段）
+        //  数据层
         // ============================================================
         let posts = JSON.parse(localStorage.getItem("posts")) || [];
 
+        // 迁移旧数据：确保每个文章有 notes 数组
         posts = posts.map(p => {
-            if (!p.id) {
-                p.id = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-            }
-            if (!p.annotations) {
-                p.annotations = []; // 批注数组
-            }
+            if (!p.id) p.id = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            if (!p.notes) p.notes = []; // 批注数组
             return p;
         });
         localStorage.setItem("posts", JSON.stringify(posts));
 
-        let currentId = null;          // 当前阅读的文章 id
+        let currentId = null;
         let uploaded = [];
-        let currentAnnotations = [];   // 当前文章的批注（引用）
-        let selectedRange = null;     // 用户选中的范围（用于添加批注）
 
         // ============================================================
-        //  2. 发布（增加 annotations 字段）
-        // ============================================================
-        function publish() {
-            const titleVal = document.getElementById("title").value.trim();
-            const bioVal = document.getElementById("bio").value.trim();
-            const contentVal = document.getElementById("content").value.trim();
-
-            if (!titleVal) {
-                alert("请填写标题");
-                return;
-            }
-
-            const newPost = {
-                id: Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-                title: titleVal,
-                bio: bioVal || "暂无简介",
-                content: contentVal || "（空内容）",
-                media: [...uploaded],
-                date: new Date().toISOString().slice(0, 10),
-                annotations: []
-            };
-
-            posts.unshift(newPost);
-            localStorage.setItem("posts", JSON.stringify(posts));
-
-            // 清空编辑器
-            document.getElementById("title").value = "";
-            document.getElementById("bio").value = "";
-            document.getElementById("content").value = "";
-            uploaded = [];
-            document.querySelector(".upload input[type=file]").value = "";
-
-            closeEditor();
-            render();
-        }
-
-        // ============================================================
-        //  3. 文件上传
-        // ============================================================
-        function handleFiles(e) {
-            const files = [...e.target.files];
-            files.forEach(file => {
-                const url = URL.createObjectURL(file);
-                if (file.type.startsWith("image")) {
-                    uploaded.push({ type: "img", url });
-                } else if (file.type.startsWith("video")) {
-                    uploaded.push({ type: "video", url });
-                }
-            });
-        }
-
-        // ============================================================
-        //  4. 渲染列表（批注按钮变色，去掉批注文本显示）
+        //  渲染列表
         // ============================================================
         function render(list) {
             const el = document.getElementById("list");
@@ -676,33 +616,48 @@
                 titleDiv.textContent = p.title;
                 left.appendChild(titleDiv);
 
-                const dateSpan = document.createElement("div");
+                const metaDiv = document.createElement("div");
+                metaDiv.style.display = "flex";
+                metaDiv.style.alignItems = "center";
+                metaDiv.style.flexWrap = "wrap";
+                metaDiv.style.gap = "4px 8px";
+
+                const dateSpan = document.createElement("span");
                 dateSpan.className = "date";
                 dateSpan.textContent = p.date;
-                left.appendChild(dateSpan);
+                metaDiv.appendChild(dateSpan);
 
+                // 显示批注预览（第一条批注的片段）
+                if (p.notes && p.notes.length > 0) {
+                    const preview = document.createElement("span");
+                    preview.className = "note-preview";
+                    const firstNote = p.notes[0];
+                    const snippet = firstNote.originalText.length > 20 ? firstNote.originalText.slice(0, 20) + '…' : firstNote.originalText;
+                    preview.textContent = '💬 ' + snippet;
+                    metaDiv.appendChild(preview);
+                }
+
+                left.appendChild(metaDiv);
                 div.appendChild(left);
 
                 const actions = document.createElement("div");
                 actions.className = "post-actions";
 
-                // 批注按钮（根据是否有批注变色）
+                // 批注按钮：根据是否有批注变色
                 const noteBtn = document.createElement("button");
                 noteBtn.className = "post-note-btn";
-                if (p.annotations && p.annotations.length > 0) {
-                    noteBtn.classList.add("has-note");
-                }
                 noteBtn.innerHTML = "✏️";
-                noteBtn.setAttribute("aria-label", "批注");
+                noteBtn.setAttribute("aria-label", "批注状态");
+                // 变色逻辑
+                if (p.notes && p.notes.length > 0) {
+                    noteBtn.classList.add("has-note");
+                } else {
+                    noteBtn.classList.add("no-note");
+                }
                 noteBtn.onclick = function(e) {
                     e.stopPropagation();
-                    // 直接打开文章并滚动到批注面板
+                    // 点击批注按钮可以快速打开阅读页并聚焦到批注？简单起见，直接打开文章
                     openPost(p.id);
-                    // 延迟滚动到面板
-                    setTimeout(() => {
-                        const panel = document.getElementById("annotationPanel");
-                        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 300);
                 };
                 actions.appendChild(noteBtn);
 
@@ -728,32 +683,76 @@
         }
 
         // ============================================================
-        //  5. 打开文章（渲染高亮批注）
+        //  删除文章
+        // ============================================================
+        function deletePost(id) {
+            if (!confirm("确定要删除这篇文章吗？删除后无法恢复。")) return;
+            const index = posts.findIndex(p => p.id === id);
+            if (index === -1) return;
+            posts.splice(index, 1);
+            localStorage.setItem("posts", JSON.stringify(posts));
+            if (currentId === id) {
+                closeReader();
+                currentId = null;
+            }
+            render();
+        }
+
+        // ============================================================
+        //  打开阅读页（带批注高亮）
         // ============================================================
         function openPost(id) {
             const p = posts.find(item => item.id === id);
             if (!p) {
-                alert("文章不存在或已被删除");
+                alert("文章不存在");
                 return;
             }
-
             currentId = id;
-            currentAnnotations = p.annotations || [];
 
-            // 清空旧事件监听
-            const main = document.getElementById("readerMain");
-            // 渲染标题（带高亮）
+            // 设置标题（带批注高亮）
             const titleEl = document.getElementById("rTitle");
-            titleEl.innerHTML = applyHighlights(p.title, currentAnnotations, 'title');
-
-            document.getElementById("rDate").textContent = p.date;
-
-            // 渲染正文（带高亮）
+            const dateEl = document.getElementById("rDate");
             const textEl = document.getElementById("rText");
-            textEl.innerHTML = applyHighlights(p.content, currentAnnotations, 'content');
+            const mediaEl = document.getElementById("rMedia");
+
+            dateEl.textContent = p.date;
+
+            // 处理标题和正文中的批注高亮
+            const notes = p.notes || [];
+            // 构建高亮 HTML：将原文中的批注原文用 span 包裹
+            const highlightText = (text, notes) => {
+                if (!notes || notes.length === 0) return text;
+                // 为避免重复替换导致问题，我们按原文长度从长到短排序
+                const sorted = [...notes].sort((a, b) => b.originalText.length - a.originalText.length);
+                let result = text;
+                // 使用正则替换，但需要转义特殊字符
+                sorted.forEach(n => {
+                    const escaped = n.originalText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(escaped, 'g');
+                    // 用带有 data-note-id 的 span 替换
+                    result = result.replace(regex, match => {
+                        return `<span class="note-highlight" data-note-id="${n.id}" data-original="${encodeURIComponent(match)}">${match}</span>`;
+                    });
+                });
+                return result;
+            };
+
+            // 对标题和正文进行高亮
+            const titleHTML = highlightText(p.title, notes);
+            const contentHTML = highlightText(p.content, notes);
+
+            titleEl.innerHTML = titleHTML;
+            textEl.innerHTML = contentHTML;
+
+            // 绑定点击高亮文本事件（委托）
+            const readerContent = document.querySelector('.reader-content');
+            // 移除旧监听，使用新监听
+            readerContent.querySelectorAll('.note-highlight').forEach(el => {
+                el.removeEventListener('click', handleHighlightClick);
+                el.addEventListener('click', handleHighlightClick);
+            });
 
             // 媒体
-            const mediaEl = document.getElementById("rMedia");
             mediaEl.innerHTML = "";
             if (p.media && p.media.length > 0) {
                 p.media.forEach(m => {
@@ -774,361 +773,197 @@
                 });
             }
 
-            // 渲染批注面板
-            renderAnnotationPanel(currentAnnotations);
-
-            // 显示阅读页
-            document.getElementById("reader").style.display = "flex";
+            document.getElementById("reader").style.display = "block";
             document.body.style.overflow = "hidden";
-
-            // 绑定选择事件
-            document.addEventListener('selectionchange', handleSelection);
-            // 清除之前的选中
-            selectedRange = null;
-            updateAddButtonState();
+            // 关闭右侧面板
+            closeNotePanel();
         }
 
-        // ============================================================
-        //  6. 高亮渲染辅助（根据批注位置）
-        // ============================================================
-        function applyHighlights(text, annotations, targetType) {
-            if (!text) return text;
-            // 过滤出属于该 targetType 的批注
-            const anns = annotations.filter(a => a.target === targetType);
-            if (anns.length === 0) return text;
-
-            // 按起始偏移量降序排列，以便从后往前插入标签避免偏移
-            const sorted = [...anns].sort((a, b) => b.startOffset - a.startOffset);
-
-            let result = text;
-            for (const ann of sorted) {
-                const start = ann.startOffset;
-                const end = ann.endOffset;
-                if (start < 0 || end > result.length || start >= end) continue;
-                // 切割
-                const before = result.substring(0, start);
-                const highlighted = result.substring(start, end);
-                const after = result.substring(end);
-                // 用 span 包裹
-                const span = `<span class="annotated" data-anno-id="${ann.id}" data-target="${targetType}">${highlighted}</span>`;
-                result = before + span + after;
-            }
-            return result;
-        }
-
-        // ============================================================
-        //  7. 批注面板渲染
-        // ============================================================
-        function renderAnnotationPanel(annotations) {
-            const container = document.getElementById("annotationList");
-            if (!annotations || annotations.length === 0) {
-                container.innerHTML = `<div class="annotation-empty">暂无批注<br>选中文字后点击「添加批注」</div>`;
-                return;
-            }
-            let html = '';
-            annotations.forEach(a => {
-                html += `
-                    <div class="annotation-item" data-id="${a.id}">
-                        <div class="original">「${escapeHtml(a.selectedText)}」</div>
-                        <div class="note-text">${escapeHtml(a.note)}</div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function escapeHtml(str) {
-            const div = document.createElement("div");
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        // ============================================================
-        //  8. 选择处理 + 添加批注
-        // ============================================================
-        function handleSelection() {
-            const sel = window.getSelection();
-            if (!sel.rangeCount || sel.isCollapsed) {
-                selectedRange = null;
-                updateAddButtonState();
-                return;
-            }
-            const range = sel.getRangeAt(0);
-            // 检查是否在阅读区域内
-            const main = document.getElementById("readerMain");
-            if (!main.contains(range.commonAncestorContainer)) {
-                selectedRange = null;
-                updateAddButtonState();
-                return;
-            }
-            // 确保选中文本不跨元素（简单处理）
-            selectedRange = range;
-            updateAddButtonState();
-        }
-
-        function updateAddButtonState() {
-            const btn = document.getElementById("addAnnoBtn");
-            if (selectedRange && !selectedRange.collapsed) {
-                btn.disabled = false;
-                btn.textContent = '✏️ 添加批注';
-            } else {
-                btn.disabled = true;
-                btn.textContent = '✏️ 选择文字';
-            }
-        }
-
-        function addAnnotation() {
-            if (!selectedRange || selectedRange.collapsed) {
-                alert('请先在文章中选择一段文字（标题或正文）');
-                return;
-            }
-
-            const sel = window.getSelection();
-            const text = sel.toString().trim();
-            if (!text) {
-                alert('所选内容为空');
-                return;
-            }
-
-            // 判断选中文本属于标题还是正文
-            const titleEl = document.getElementById("rTitle");
-            const textEl = document.getElementById("rText");
-            const container = selectedRange.commonAncestorContainer;
-            let targetType = 'content';
-            let fullText = '';
-            if (titleEl.contains(container)) {
-                targetType = 'title';
-                fullText = titleEl.textContent; // 原始文本（不含标签）
-            } else if (textEl.contains(container)) {
-                targetType = 'content';
-                fullText = textEl.textContent;
-            } else {
-                alert('请选择标题或正文区域的文字');
-                return;
-            }
-
-            // 计算偏移量：在纯文本中查找选中文本的位置（考虑可能有多个相同，使用 indexOf 但不精确，但作为演示）
-            // 为了准确，我们利用 range 的 startOffset 和 endOffset，但需要考虑文本节点偏移。
-            // 简化：直接利用 range 的 startContainer 和 offset，但比较复杂。
-            // 我们采用更可靠的方法：根据所选文本在 fullText 中的位置（利用 indexOf），但可能不唯一。
-            // 为了演示，我们使用 indexOf，并假设唯一。但更好的做法是存储节点路径，但为了代码简洁，我们采用 indexOf + 向后查找。
-            // 这里我们使用 range 的 startOffset 和 endOffset 相对于其文本节点，但如果在多个文本节点中，需要累加。
-            // 为了演示简便，我们用全文搜索第一个匹配（可能存在歧义）。
-            // 更稳健的做法：在全文里查找选中文本，从后往前找多个匹配？但太复杂。
-            // 我们选择使用 range 的 startContainer 和 offset，但我们知道 range 是选中的范围，可以直接获取 startOffset/endOffset 相对于 startContainer。
-            // 如果 startContainer 是文本节点，那么 offset 就是在该文本节点中的偏移。
-            // 如果跨多个文本节点，则需拼接。但我们可以取 range 的 commonAncestorContainer，但文本可能跨节点。
-            // 为了简单，我们只处理单个文本节点的情况（即选中的文本在同一个文本节点内）。大多数情况下是。
-            let startOffset, endOffset;
-            const startNode = selectedRange.startContainer;
-            const endNode = selectedRange.endContainer;
-            if (startNode.nodeType === 3 && endNode.nodeType === 3 && startNode === endNode) {
-                // 同一文本节点
-                startOffset = selectedRange.startOffset;
-                endOffset = selectedRange.endOffset;
-            } else {
-                // 跨节点，使用全文搜索（不精确）
-                const fullTextClean = fullText;
-                const idx = fullTextClean.indexOf(text);
-                if (idx === -1) {
-                    alert('无法定位所选文本，请重试');
-                    return;
-                }
-                startOffset = idx;
-                endOffset = idx + text.length;
-            }
-
-            // 检查是否已有批注覆盖该位置（去重）
-            const existing = currentAnnotations.find(a => a.target === targetType && a.startOffset === startOffset && a.endOffset === endOffset);
-            if (existing) {
-                alert('该文本已有批注，请编辑或删除旧批注');
-                return;
-            }
-
-            const note = prompt('请输入批注内容：');
-            if (note === null || note.trim() === '') {
-                return; // 取消或空
-            }
-
-            const newAnno = {
-                id: 'anno_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                target: targetType,
-                startOffset: startOffset,
-                endOffset: endOffset,
-                selectedText: text,
-                note: note.trim()
-            };
-
-            // 更新数据
-            const post = posts.find(p => p.id === currentId);
-            if (!post) {
-                alert('文章不存在');
-                return;
-            }
-            if (!post.annotations) post.annotations = [];
-            post.annotations.push(newAnno);
-            localStorage.setItem("posts", JSON.stringify(posts));
-
-            // 重新渲染文章
-            openPost(currentId); // 刷新
-
-            // 清除选择
-            window.getSelection().removeAllRanges();
-            selectedRange = null;
-            updateAddButtonState();
-        }
-
-        // ============================================================
-        //  9. 删除批注（通过点击批注项删除？我们增加删除功能）
-        // 可以在批注面板的每个项加个删除按钮，但用户未明确要求，先忽略。
-        // 但可以增加：双击批注项删除，或者加个小叉。
-        // 为了完善，我们在批注项上添加删除按钮。
-        // 在渲染时添加删除按钮，并绑定事件。
-        // 修改 renderAnnotationPanel
-        // ============================================================
-        // 我们重新定义 renderAnnotationPanel 以包含删除按钮
-        // 但为了不重新加载全部，我们覆盖原函数
-        const originalRender = renderAnnotationPanel;
-        renderAnnotationPanel = function(annotations) {
-            const container = document.getElementById("annotationList");
-            if (!annotations || annotations.length === 0) {
-                container.innerHTML = `<div class="annotation-empty">暂无批注<br>选中文字后点击「添加批注」</div>`;
-                return;
-            }
-            let html = '';
-            annotations.forEach(a => {
-                html += `
-                    <div class="annotation-item" data-id="${a.id}">
-                        <div class="original">「${escapeHtml(a.selectedText)}」</div>
-                        <div class="note-text">${escapeHtml(a.note)}</div>
-                        <button style="margin-top:8px;background:none;border:1px solid #ddd;border-radius:4px;padding:2px 10px;cursor:pointer;font-size:12px;color:#888;" onclick="deleteAnnotation('${a.id}')">删除</button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        };
-
-        // 删除批注
-        function deleteAnnotation(annoId) {
-            if (!confirm('确定删除这条批注吗？')) return;
+        // 高亮点击处理
+        function handleHighlightClick(e) {
+            const el = e.currentTarget;
+            const noteId = el.dataset.noteId;
+            const original = decodeURIComponent(el.dataset.original || '');
+            // 在 currentId 对应的文章中找到批注
             const post = posts.find(p => p.id === currentId);
             if (!post) return;
-            const idx = post.annotations.findIndex(a => a.id === annoId);
-            if (idx !== -1) {
-                post.annotations.splice(idx, 1);
-                localStorage.setItem("posts", JSON.stringify(posts));
-                openPost(currentId); // 刷新
+            const note = post.notes.find(n => n.id === noteId);
+            if (!note) {
+                // 若找不到，尝试用原文匹配
+                const found = post.notes.find(n => n.originalText === original);
+                if (found) {
+                    showNotePanel(found);
+                } else {
+                    alert('批注数据异常');
+                }
+            } else {
+                showNotePanel(note);
             }
         }
 
+        // 显示右侧面板
+        function showNotePanel(note) {
+            document.getElementById("panelOriginal").textContent = note.originalText;
+            document.getElementById("panelNote").textContent = note.noteText;
+            document.getElementById("notePanel").classList.add("open");
+        }
+
+        function closeNotePanel() {
+            document.getElementById("notePanel").classList.remove("open");
+        }
+
         // ============================================================
-        //  10. 删除文章
+        //  添加批注（基于当前选中文本）
         // ============================================================
-        function deletePost(id) {
-            if (!confirm("确定要删除这篇文章吗？删除后无法恢复。")) {
+        function addNoteFromSelection() {
+            if (!currentId) {
+                alert("请先打开一篇文章");
                 return;
             }
-            const index = posts.findIndex(p => p.id === id);
-            if (index === -1) {
+            const post = posts.find(p => p.id === currentId);
+            if (!post) {
                 alert("文章不存在");
                 return;
             }
-            posts.splice(index, 1);
-            localStorage.setItem("posts", JSON.stringify(posts));
 
-            if (currentId === id) {
-                closeReader();
-                currentId = null;
-            }
-            render();
-        }
-
-        function deleteCurrentPost() {
-            if (!currentId) {
-                alert("没有正在阅读的文章");
+            // 获取当前选中的文本（在阅读页中）
+            const sel = window.getSelection();
+            const selectedText = sel.toString().trim();
+            if (!selectedText) {
+                alert("请先在文章中选中一段文本（标题或正文）");
                 return;
             }
-            deletePost(currentId);
+
+            // 检查是否在阅读页内（防止选中外部）
+            const readerEl = document.getElementById("reader");
+            if (!readerEl.contains(sel.anchorNode)) {
+                alert("请选中文章内容中的文本");
+                return;
+            }
+
+            // 输入批注内容
+            const noteText = prompt("请输入批注内容：");
+            if (noteText === null) return; // 取消
+            const trimmedNote = noteText.trim();
+            if (!trimmedNote) {
+                alert("批注内容不能为空");
+                return;
+            }
+
+            // 创建批注对象
+            const note = {
+                id: Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                originalText: selectedText,
+                noteText: trimmedNote
+            };
+            post.notes.push(note);
+            localStorage.setItem("posts", JSON.stringify(posts));
+
+            // 重新渲染阅读页以显示高亮
+            // 但为了不丢失当前滚动，直接调用 openPost 刷新
+            openPost(currentId);
+            // 高亮更新后，自动打开该批注的面板
+            // 查找刚添加的高亮元素
+            setTimeout(() => {
+                const highlights = document.querySelectorAll('.note-highlight');
+                for (let el of highlights) {
+                    if (el.dataset.noteId === note.id) {
+                        el.scrollIntoView({ block: 'center' });
+                        // 模拟点击显示面板
+                        handleHighlightClick({ currentTarget: el });
+                        break;
+                    }
+                }
+                // 更新列表中的批注按钮颜色
+                render();
+            }, 50);
         }
 
         // ============================================================
-        //  11. 搜索
+        //  搜索
         // ============================================================
         function search(keyword) {
             const k = keyword.trim().toLowerCase();
-            if (!k) {
-                render(posts);
-                return;
-            }
+            if (!k) { render(posts); return; }
             const filtered = posts.filter(p =>
                 p.title.toLowerCase().includes(k) ||
                 p.content.toLowerCase().includes(k) ||
                 (p.bio && p.bio.toLowerCase().includes(k)) ||
-                (p.annotations && p.annotations.some(a => a.note.toLowerCase().includes(k) || a.selectedText.toLowerCase().includes(k)))
+                (p.notes && p.notes.some(n => n.originalText.toLowerCase().includes(k) || n.noteText.toLowerCase().includes(k)))
             );
             render(filtered);
         }
 
         // ============================================================
-        //  12. 控制
+        //  编辑器相关（发布、文件上传）
+        // ============================================================
+        function publish() {
+            const titleVal = document.getElementById("title").value.trim();
+            const bioVal = document.getElementById("bio").value.trim();
+            const contentVal = document.getElementById("content").value.trim();
+            if (!titleVal) { alert("请填写标题"); return; }
+
+            const newPost = {
+                id: Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                title: titleVal,
+                bio: bioVal || "暂无简介",
+                content: contentVal || "（空内容）",
+                media: [...uploaded],
+                date: new Date().toISOString().slice(0, 10),
+                notes: []
+            };
+            posts.unshift(newPost);
+            localStorage.setItem("posts", JSON.stringify(posts));
+
+            document.getElementById("title").value = "";
+            document.getElementById("bio").value = "";
+            document.getElementById("content").value = "";
+            uploaded = [];
+            document.querySelector(".upload input[type=file]").value = "";
+            closeEditor();
+            render();
+        }
+
+        function handleFiles(e) {
+            const files = [...e.target.files];
+            files.forEach(file => {
+                const url = URL.createObjectURL(file);
+                if (file.type.startsWith("image")) uploaded.push({ type: "img", url });
+                else if (file.type.startsWith("video")) uploaded.push({ type: "video", url });
+            });
+        }
+
+        // ============================================================
+        //  UI 控制
         // ============================================================
         function openEditor() {
             document.getElementById("editor").style.display = "flex";
             document.body.style.overflow = "hidden";
         }
-
         function closeEditor() {
             document.getElementById("editor").style.display = "none";
             document.body.style.overflow = "";
         }
-
         function closeReader() {
             document.getElementById("reader").style.display = "none";
             document.body.style.overflow = "";
-            document.removeEventListener('selectionchange', handleSelection);
             currentId = null;
-            selectedRange = null;
+            closeNotePanel();
         }
 
-        // ============================================================
-        //  13. 键盘快捷键
-        // ============================================================
+        // ESC 关闭
         document.addEventListener("keydown", function(e) {
             if (e.key === "Escape") {
-                if (document.getElementById("reader").style.display === "flex") {
-                    closeReader();
-                } else if (document.getElementById("editor").style.display === "flex") {
-                    closeEditor();
-                }
+                if (document.getElementById("reader").style.display === "block") closeReader();
+                else if (document.getElementById("editor").style.display === "flex") closeEditor();
+                else if (document.getElementById("notePanel").classList.contains("open")) closeNotePanel();
             }
         });
 
         // ============================================================
-        //  14. 初始化
+        //  初始化
         // ============================================================
         render();
-
-        // 额外：在阅读页点击高亮文本时，在右侧面板滚动到对应批注（可选）
-        // 通过事件委托监听点击高亮文本
-        document.addEventListener('click', function(e) {
-            const target = e.target.closest('.annotated');
-            if (target && document.getElementById("reader").style.display === "flex") {
-                const annoId = target.dataset.annoId;
-                if (annoId) {
-                    // 在面板中高亮对应的批注项
-                    const items = document.querySelectorAll('.annotation-item');
-                    items.forEach(item => {
-                        item.style.background = '#fff';
-                        item.style.borderLeftColor = '#ffb347';
-                        if (item.dataset.id === annoId) {
-                            item.style.background = '#fef9e7';
-                            item.style.borderLeftColor = '#f39c12';
-                            item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                    });
-                }
-            }
-        });
     </script>
 
 </body>
