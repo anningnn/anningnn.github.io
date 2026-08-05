@@ -85,7 +85,7 @@
 
         .post {
             background: #fff;
-            padding: 16px 18px;
+            padding: 14px 18px;
             border-radius: 14px;
             margin-bottom: 14px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
@@ -112,75 +112,68 @@
         .post-left .date {
             font-size: 12px;
             color: #999;
+            margin-right: 6px;
         }
-        .post-left .note-preview {
+        .post-left .note {
             font-size: 13px;
-            color: #6c7a89;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .post-left .note-preview .note-icon {
-            font-size: 14px;
-        }
-        .post-left .note-preview .note-text {
-            background: #f0f2f5;
+            color: #888;
+            font-style: italic;
+            background: #f4f4f6;
             padding: 2px 10px;
-            border-radius: 12px;
-            max-width: 200px;
+            border-radius: 20px;
+            display: inline-block;
+            max-width: 100%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-style: italic;
+            vertical-align: middle;
+            margin-top: 3px;
         }
-        .post-left .note-preview .note-text.empty {
-            color: #bbb;
-            font-style: normal;
+        .post-left .note:empty {
+            display: none;
         }
 
-        /* ===== 右侧操作按钮组 ===== */
+        /* 右侧按钮组 */
         .post-actions {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             flex-shrink: 0;
             margin-left: 12px;
         }
-        .post-actions button {
+
+        /* ===== 缩小后的删除按钮 ===== */
+        .post-delete {
             background: none;
             border: none;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* 批注按钮 - 小尺寸 */
-        .note-btn {
-            font-size: 16px;
-            padding: 4px 6px;
-            color: #888;
-        }
-        .note-btn:hover {
-            background: #e8f0fe;
-            color: #1a73e8;
-        }
-        .note-btn.has-note {
-            color: #1a73e8;
-        }
-
-        /* 删除按钮 - 更小 */
-        .post-delete {
-            font-size: 14px;
-            padding: 2px 6px;
             color: #ccc;
+            font-size: 16px;        /* 从 22px 调小 */
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            line-height: 1.4;
         }
         .post-delete:hover {
             color: #e74c3c;
             background: #fee8e8;
+        }
+
+        /* ===== 批注按钮 ===== */
+        .post-note-btn {
+            background: none;
+            border: none;
+            color: #bbb;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            line-height: 1.4;
+        }
+        .post-note-btn:hover {
+            color: #2d7aff;
+            background: #eaf1ff;
         }
 
         /* ===== + 按钮 ===== */
@@ -350,46 +343,7 @@
             cursor: zoom-in;
         }
 
-        /* ===== 阅读页批注区域 ===== */
-        .reader-note {
-            margin-top: 32px;
-            padding: 16px 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            border-left: 4px solid #1a73e8;
-        }
-        .reader-note .note-label {
-            font-size: 13px;
-            color: #666;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .reader-note .note-label button {
-            background: none;
-            border: none;
-            color: #1a73e8;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 0 6px;
-        }
-        .reader-note .note-label button:hover {
-            text-decoration: underline;
-        }
-        .reader-note .note-body {
-            margin-top: 8px;
-            font-size: 15px;
-            color: #333;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        .reader-note .note-body.empty {
-            color: #aaa;
-            font-style: italic;
-        }
-
-        /* ===== 阅读页底部删除 ===== */
+        /* ===== 阅读页删除按钮 ===== */
         .reader-delete {
             margin-top: 32px;
             padding-top: 20px;
@@ -443,13 +397,17 @@
                 font-size: 22px;
             }
             .post {
-                padding: 14px 14px;
+                padding: 12px 14px;
+                flex-wrap: wrap;
             }
-            .post-left h3 {
-                font-size: 15px;
+            .post-left {
+                flex: 1 1 100%;
+                margin-bottom: 6px;
             }
-            .post-left .note-preview .note-text {
-                max-width: 120px;
+            .post-actions {
+                margin-left: 0;
+                justify-content: flex-end;
+                width: 100%;
             }
             .fab {
                 right: 16px;
@@ -457,17 +415,6 @@
                 width: 50px;
                 height: 50px;
                 font-size: 26px;
-            }
-            .post-actions {
-                gap: 2px;
-            }
-            .note-btn {
-                font-size: 14px;
-                padding: 2px 4px;
-            }
-            .post-delete {
-                font-size: 12px;
-                padding: 2px 4px;
             }
         }
     </style>
@@ -520,16 +467,6 @@
             <div class="reader-text" id="rText"></div>
             <div class="reader-media" id="rMedia"></div>
 
-            <!-- 批注区域 -->
-            <div class="reader-note" id="readerNote">
-                <div class="note-label">
-                    <span>📝 批注</span>
-                    <button onclick="editNoteFromReader()">编辑</button>
-                </div>
-                <div class="note-body" id="rNoteBody"></div>
-            </div>
-
-            <!-- 删除 -->
             <div class="reader-delete">
                 <button onclick="deleteCurrentPost()">🗑 删除这篇文章</button>
             </div>
@@ -539,23 +476,23 @@
 
     <script>
         // ============================================================
-        //  1. 数据加载  +  兼容旧数据（自动生成 id 和 note）
+        //  1. 数据加载  +  兼容旧数据（自动生成 id）
         // ============================================================
         let posts = JSON.parse(localStorage.getItem("posts")) || [];
 
-        // 为没有 id / note 的旧数据补充
+        // 为没有 id 的旧数据生成唯一 id，并确保有 note 字段
         posts = posts.map(p => {
             if (!p.id) {
                 p.id = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
             }
             if (p.note === undefined) {
-                p.note = '';
+                p.note = "";
             }
             return p;
         });
         localStorage.setItem("posts", JSON.stringify(posts));
 
-        let currentId = null; // 当前阅读的文章 id
+        let currentId = null;
         let uploaded = [];
 
         // ============================================================
@@ -578,7 +515,7 @@
                 content: contentVal || "（空内容）",
                 media: [...uploaded],
                 date: new Date().toISOString().slice(0, 10),
-                note: '' // 初始无批注
+                note: "" // 批注初始为空
             };
 
             posts.unshift(newPost);
@@ -611,7 +548,7 @@
         }
 
         // ============================================================
-        //  4. 渲染列表  （带批注预览）
+        //  4. 渲染列表（增加批注显示和批注按钮）
         // ============================================================
         function render(list) {
             const el = document.getElementById("list");
@@ -627,42 +564,54 @@
                 const div = document.createElement("div");
                 div.className = "post";
 
-                // 左半部分：标题 + 日期 + 批注预览
+                // 左半部分：标题 + 日期 + 批注
                 const left = document.createElement("div");
                 left.className = "post-left";
 
-                const titleHtml = `<h3>${escapeHtml(p.title)}</h3>`;
-                const dateHtml = `<div class="date">${p.date}</div>`;
+                // 标题
+                const titleDiv = document.createElement("h3");
+                titleDiv.textContent = p.title;
+                left.appendChild(titleDiv);
 
-                // 批注预览
-                let noteHtml = '';
-                const hasNote = p.note && p.note.trim().length > 0;
-                const noteText = hasNote ? p.note : '添加批注…';
-                const noteClass = hasNote ? 'note-text' : 'note-text empty';
-                noteHtml = `
-                    <div class="note-preview">
-                        <span class="note-icon">✎</span>
-                        <span class="${noteClass}">${escapeHtml(noteText)}</span>
-                    </div>
-                `;
+                // 日期和批注放在同一行（使用 flex）
+                const metaDiv = document.createElement("div");
+                metaDiv.style.display = "flex";
+                metaDiv.style.alignItems = "center";
+                metaDiv.style.flexWrap = "wrap";
+                metaDiv.style.gap = "4px 8px";
 
-                left.innerHTML = titleHtml + dateHtml + noteHtml;
+                const dateSpan = document.createElement("span");
+                dateSpan.className = "date";
+                dateSpan.textContent = p.date;
+                metaDiv.appendChild(dateSpan);
 
-                // 右侧操作按钮组
+                // 批注显示（如果有）
+                if (p.note && p.note.trim()) {
+                    const noteSpan = document.createElement("span");
+                    noteSpan.className = "note";
+                    noteSpan.textContent = p.note;
+                    metaDiv.appendChild(noteSpan);
+                }
+
+                left.appendChild(metaDiv);
+                div.appendChild(left);
+
+                // 右侧按钮组
                 const actions = document.createElement("div");
                 actions.className = "post-actions";
 
-                // 批注按钮（小铅笔）
+                // 批注按钮
                 const noteBtn = document.createElement("button");
-                noteBtn.className = `note-btn ${hasNote ? 'has-note' : ''}`;
-                noteBtn.innerHTML = "✎";
-                noteBtn.setAttribute("aria-label", "编辑批注");
+                noteBtn.className = "post-note-btn";
+                noteBtn.innerHTML = "✏️";
+                noteBtn.setAttribute("aria-label", "添加批注");
                 noteBtn.onclick = function(e) {
                     e.stopPropagation();
                     editNote(p.id);
                 };
+                actions.appendChild(noteBtn);
 
-                // 删除按钮（更小）
+                // 删除按钮（缩小版）
                 const delBtn = document.createElement("button");
                 delBtn.className = "post-delete";
                 delBtn.innerHTML = "✕";
@@ -671,11 +620,8 @@
                     e.stopPropagation();
                     deletePost(p.id);
                 };
-
-                actions.appendChild(noteBtn);
                 actions.appendChild(delBtn);
 
-                div.appendChild(left);
                 div.appendChild(actions);
 
                 // 点击卡片打开文章
@@ -687,56 +633,24 @@
             });
         }
 
-        function escapeHtml(str) {
-            const div = document.createElement("div");
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
         // ============================================================
-        //  5. 批注功能（列表页 + 阅读页）
+        //  5. 批注功能（便捷编辑）
         // ============================================================
         function editNote(id) {
             const post = posts.find(p => p.id === id);
-            if (!post) return;
+            if (!post) {
+                alert("文章不存在");
+                return;
+            }
 
-            const newNote = prompt("编辑批注（可为空）：", post.note || '');
+            // 使用 prompt 快速输入批注（简便快捷）
+            const currentNote = post.note || "";
+            const newNote = prompt("请输入批注内容（可留空删除）:", currentNote);
             if (newNote === null) return; // 用户取消
 
-            updateNote(id, newNote.trim());
-        }
-
-        function updateNote(id, noteText) {
-            const post = posts.find(p => p.id === id);
-            if (!post) return;
-
-            post.note = noteText || '';
+            post.note = newNote.trim();
             localStorage.setItem("posts", JSON.stringify(posts));
-
-            // 如果当前阅读的文章正好是这篇，更新阅读页的批注显示
-            if (currentId === id) {
-                displayReaderNote(post);
-            }
-
             render(); // 刷新列表
-        }
-
-        // 阅读页编辑批注
-        function editNoteFromReader() {
-            if (!currentId) return;
-            editNote(currentId);
-        }
-
-        // 在阅读页显示批注
-        function displayReaderNote(post) {
-            const noteBody = document.getElementById("rNoteBody");
-            if (post.note && post.note.trim().length > 0) {
-                noteBody.textContent = post.note;
-                noteBody.className = "note-body";
-            } else {
-                noteBody.textContent = "（无批注）";
-                noteBody.className = "note-body empty";
-            }
         }
 
         // ============================================================
@@ -776,9 +690,6 @@
                     }
                 });
             }
-
-            // 显示批注
-            displayReaderNote(p);
 
             document.getElementById("reader").style.display = "block";
             document.body.style.overflow = "hidden";
